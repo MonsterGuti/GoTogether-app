@@ -1,0 +1,171 @@
+{% extends 'rides/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .hero-search-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+    .ride-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .ride-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Секция и Търсачка -->
+<div class="row justify-content-center my-4">
+    <div class="col-lg-10">
+        <div class="card hero-search-card shadow-lg border-0 rounded-4 p-4 p-md-5 text-center">
+
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3 mx-auto" style="width: 64px; height: 64px;">
+                <i class="fa-solid fa-compass fs-2"></i>
+            </div>
+
+            <h2 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Намери следващото си пътуване</h2>
+            <p class="text-muted mb-4 fs-6">Сподели разходите и пътувай бързо и изгодно</p>
+
+            <div class="search-container">
+                <form method="GET" action="{% url 'home' %}" class="row g-2 align-items-center">
+
+                    <!-- Откъде -->
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </span>
+                            <input type="text" name="origin" value="{{ origin_query }}"
+                                   class="form-control bg-white border-start-0 py-2" placeholder="Откъде тръгваш?">
+                        </div>
+                    </div>
+
+                    <!-- Накъде -->
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="fa-solid fa-location-arrow"></i>
+                            </span>
+                            <input type="text" name="destination" value="{{ destination_query }}"
+                                   class="form-control bg-white border-start-0 py-2" placeholder="Накъде отиваш?">
+                        </div>
+                    </div>
+
+                    <!-- Дата -->
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="fa-solid fa-calendar-days"></i>
+                            </span>
+                            <input type="date" name="date" value="{{ date_query }}"
+                                   class="form-control bg-white border-start-0 py-2">
+                        </div>
+                    </div>
+
+                    <!-- Бутон Търси -->
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>Търси пътуване</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Списък с пътувания -->
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-10">
+
+        <!-- Хедър на списъка -->
+        <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+            <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-car-side text-primary"></i> Предстоящи маршрути
+            </h5>
+            <span class="badge bg-secondary-subtle text-secondary border px-3 py-2 rounded-pill fw-medium">
+                {{ rides|length }} намерени
+            </span>
+        </div>
+
+        <div class="row g-3">
+            {% for ride in rides %}
+                <div class="col-md-6">
+                    <a href="{% if user.is_authenticated %}{% url 'ride_detail' ride.pk %}{% else %}{% url 'login' %}?next={% url 'ride_detail' ride.pk %}{% endif %}" class="text-decoration-none text-dark d-block">
+                        <div class="card ride-card p-3 border-0 shadow-sm rounded-4 bg-white h-100">
+
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2" style="letter-spacing: -0.3px;">
+                                        <span>{{ ride.origin }}</span>
+                                        <i class="fa-solid fa-arrow-right-long text-muted fs-6"></i>
+                                        <span>{{ ride.destination }}</span>
+                                    </h5>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-bold rounded-pill">
+                                    {{ ride.price_per_seat }} €
+                                </span>
+                            </div>
+
+                            <div class="text-muted small mb-3 d-flex align-items-center gap-2">
+                                <i class="fa-regular fa-clock text-secondary"></i>
+                                <span>{{ ride.departure_time|date:"d M (D), H:i" }} ч.</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
+                                <div class="d-flex align-items-center">
+                                    {% if ride.driver.profile.image %}
+                                        <img src="{{ ride.driver.profile.image.url }}" class="rounded-circle me-2 object-fit-cover shadow-sm border" style="width: 32px; height: 32px;" alt="Avatar">
+                                    {% else %}
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 shadow-sm text-uppercase fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                            {{ ride.driver.username.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <span class="fw-semibold text-dark small">
+                                        {{ ride.driver.get_full_name|default:ride.driver.username }}
+                                    </span>
+                                </div>
+
+                                <span class="badge bg-light text-dark border fw-medium small d-inline-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-user-group"></i>
+                                    <span>{{ ride.available_seats }} места</span>
+                                </span>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <!-- Празен резултат -->
+                <div class="col-12 text-center py-5">
+                    <div class="bg-white p-5 rounded-4 shadow-sm border mx-auto" style="max-width: 500px;">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle mb-3" style="width: 72px; height: 72px;">
+                            <i class="fa-solid fa-car-tunnel fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Няма намерени предстоящи пътувания</h4>
+                        <p class="text-muted small mb-4">
+                            {% if origin_query or destination_query or date_query %}
+                                Няма налични маршрути по избраните критерии. Опитайте с друга дата или дестинация.
+                            {% else %}
+                                Все още няма публикувани предстоящи пътувания. Бъдете първият!
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'create_ride' %}" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm d-inline-flex align-items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Пусни пътуване</span>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

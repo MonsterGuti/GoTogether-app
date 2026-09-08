@@ -1,0 +1,93 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h3 class="fw-bold mb-4">🔔 Вашите известия</h3>
+
+        {% if notifications %}
+            <div class="list-group shadow-sm rounded-4 overflow-hidden">
+                {% for n in notifications %}
+                    {% if n.notification_type == 'review' %}
+                        <a href="{% url 'public_profile' n.recipient.username %}#reviews"
+                           class="list-group-item list-group-item-action p-3 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <!-- Аватар на подателя -->
+                                <div class="me-3 position-relative flex-shrink-0">
+                                    {% if n.sender.profile.image %}
+                                        <img src="{{ n.sender.profile.image.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                    {% elif n.sender.profile.avatar %}
+                                        <img src="{{ n.sender.profile.avatar.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                    {% elif n.sender.profile.profile_picture %}
+                                        <img src="{{ n.sender.profile.profile_picture.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                    {% else %}
+                                        <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 42px; height: 42px; font-size: 16px;">
+                                            {{ n.sender.username.0|default:'⭐' }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-dark fw-semibold">{{ n.message }}</p>
+                                    <small class="text-muted">{{ n.created_at|date:"d M, H:i" }} ч.</small>
+                                </div>
+                            </div>
+                            <span class="btn btn-sm btn-outline-primary rounded-pill px-3 flex-shrink-0">Преглед ➔</span>
+                        </a>
+
+                    {% elif n.ride %}
+                        <a href="{% url 'ride_detail' n.ride.pk %}{% if n.notification_type == 'chat' %}#chat-box{% else %}#participants-section{% endif %}"
+                           class="list-group-item list-group-item-action p-3 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <!-- Аватар на подателя -->
+                                <div class="me-3 position-relative flex-shrink-0">
+                                    {% if n.sender.profile.image %}
+                                        <img src="{{ n.sender.profile.image.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                    {% elif n.sender.profile.avatar %}
+                                        <img src="{{ n.sender.profile.avatar.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                    {% elif n.sender.profile.profile_picture %}
+                                        <img src="{{ n.sender.profile.profile_picture.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                    {% else %}
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 42px; height: 42px; font-size: 16px;">
+                                            {{ n.sender.username.0|default:'🔔' }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-dark fw-semibold">{{ n.message }}</p>
+                                    <small class="text-muted">{{ n.created_at|date:"d M, H:i" }} ч.</small>
+                                </div>
+                            </div>
+                            <span class="btn btn-sm btn-outline-primary rounded-pill px-3 flex-shrink-0">Преглед ➔</span>
+                        </a>
+
+                    {% else %}
+                        <div class="list-group-item p-3 d-flex align-items-center">
+                            <div class="me-3 position-relative flex-shrink-0">
+                                {% if n.sender.profile.image %}
+                                    <img src="{{ n.sender.profile.image.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                {% elif n.sender.profile.avatar %}
+                                    <img src="{{ n.sender.profile.avatar.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                {% elif n.sender.profile.profile_picture %}
+                                    <img src="{{ n.sender.profile.profile_picture.url }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;" alt="Avatar">
+                                {% else %}
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 42px; height: 42px; font-size: 16px;">
+                                        {{ n.sender.username.0|default:'🔔' }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="mb-1 text-dark">{{ n.message }}</p>
+                                <small class="text-muted">{{ n.created_at|date:"d M, H:i" }} ч.</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-light text-center p-4 rounded-4 shadow-sm">
+                Нямате нови или стари известия.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

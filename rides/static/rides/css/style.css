@@ -1,0 +1,272 @@
+/* ==========================================
+   ПРОФЕСИОНАЛНА ЦВЕТОВА ПАЛИТРА И ТЕМА
+   ========================================== */
+:root {
+    --gt-primary: #1E293B;       /* Дълбоко Slate синьо */
+    --gt-primary-hover: #0F172A;
+    --gt-accent: #2563EB;        /* Ярко Royal синьо */
+    --gt-accent-hover: #1D4ED8;
+    --gt-bg-main: #F1F5F9;       /* Модерен светъл сиво-син фон */
+    --gt-card-bg: #FFFFFF;
+    --gt-text-dark: #0F172A;
+    --gt-text-muted: #64748B;
+    --gt-border-color: #E2E8F0;
+    --gt-shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+    --gt-shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+}
+
+html, body {
+    background-color: var(--gt-bg-main) !important;
+    color: var(--gt-text-dark);
+    font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    scroll-behavior: smooth;
+}
+
+/* Навигация - Чисто бяла за контраст спрямо сивия фон */
+.navbar-custom {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid var(--gt-border-color);
+    padding: 1rem 0;
+    box-shadow: var(--gt-shadow-sm);
+}
+
+.brand-logo {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--gt-primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.brand-logo .dot {
+    color: var(--gt-accent);
+}
+
+/* HERO СЕКЦИЯ С МОДЕРЕН ГРАДИЕНТ */
+.hero-section {
+    background: linear-gradient(135deg, #1E293B 0%, #2563EB 100%) !important;
+    color: #FFFFFF;
+    padding: 3.5rem 1.5rem;
+    border-radius: 1.5rem;
+    box-shadow: var(--gt-shadow-md);
+    margin-bottom: 2rem;
+}
+
+.hero-section h2 {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* SEARCH КОНТЕЙНЕР */
+.search-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* ПОЛЕТА ЗА ВЪВЕЖДАНЕ */
+.form-control-gt {
+    border: 1px solid var(--gt-border-color);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    background-color: #F8FAFC;
+    color: var(--gt-text-dark);
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control-gt:focus {
+    border-color: var(--gt-accent);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+/* КАРТИ И СЕКЦИИ (CARDS) */
+.card, .ride-card {
+    background-color: var(--gt-card-bg) !important;
+    border: 1px solid var(--gt-border-color) !important;
+    border-radius: 1.25rem !important;
+    box-shadow: var(--gt-shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ride-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--gt-shadow-md);
+    border-color: #CBD5E1 !important;
+}
+
+/* БУТОНИ */
+.btn-gt-primary {
+    background-color: var(--gt-primary) !important;
+    color: #FFFFFF !important;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(30, 41, 59, 0.2);
+}
+
+.btn-gt-primary:hover {
+    background-color: var(--gt-primary-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -2px rgba(30, 41, 59, 0.3);
+}
+
+.btn-gt-accent {
+    background-color: var(--gt-accent) !important;
+    color: #FFFFFF !important;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.25);
+}
+
+.btn-gt-accent:hover {
+    background-color: var(--gt-accent-hover) !important;
+    transform: translateY(-1px);
+}
+
+.btn-gt-outline {
+    border: 2px solid var(--gt-primary);
+    color: var(--gt-primary);
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.btn-gt-outline:hover {
+    background-color: var(--gt-primary);
+    color: #FFFFFF !important;
+}
+
+.driver-avatar {
+    width: 38px;
+    height: 38px;
+    background-color: var(--gt-primary);
+    color: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* ==========================================
+   СТИЛОВЕ ЗА БУТОНА ЗА ВХОД
+   ========================================== */
+.btn-gt-login {
+    border: 2px solid var(--gt-primary);
+    color: var(--gt-primary) !important;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.6rem 1.25rem;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn-gt-login:hover {
+    background-color: var(--gt-primary);
+    color: #FFFFFF !important;
+}
+
+/* ==========================================
+   МОБИЛНИ СТИЛОВЕ
+   ========================================== */
+@media (max-width: 767.98px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Подреждане на бутоните в хамбургер менюто */
+    .navbar-collapse .d-flex {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem !important;
+        padding-top: 1rem;
+    }
+
+    /* На мобилни бутоните Вход и Регистрация да са с еднакъв размер и красив вид */
+    .btn-gt-primary,
+    .btn-gt-accent,
+    .btn-gt-login,
+    .btn-gt-outline {
+        width: 100%;
+        display: block;
+        text-align: center;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .card {
+        padding: 1.25rem !important;
+        border-radius: 1rem !important;
+    }
+
+    h3 { font-size: 1.35rem; }
+    h4 { font-size: 1.15rem; }
+
+    #chat-box {
+        max-height: 280px !important;
+        padding: 0.75rem !important;
+    }
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none !important;
+    border: none;
+}
+
+.social-btn-fb {
+    background-color: #1877F2;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(24, 119, 242, 0.25);
+}
+
+.social-btn-fb:hover {
+    background-color: #1465cc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(24, 119, 242, 0.35);
+}
+
+.social-btn-ig {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(220, 39, 67, 0.25);
+}
+
+.social-btn-ig:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 39, 67, 0.35);
+}
+
+.input-group-text-fb {
+    background-color: #e7f3ff;
+    color: #1877F2;
+    border-color: #dee2e6;
+}
+
+.input-group-text-ig {
+    background-color: #fcebf2;
+    color: #d62976;
+    border-color: #dee2e6;
+}

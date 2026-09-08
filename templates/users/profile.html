@@ -1,0 +1,268 @@
+{% extends 'rides/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Стилове за бранд бутоните с !important за сигурно прилагане */
+    .social-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 8px 18px !important;
+        border-radius: 50px !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        transition: all 0.25s ease !important;
+        text-decoration: none !important;
+        border: none !important;
+    }
+
+    .social-btn-fb {
+        background-color: #1877F2 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 10px rgba(24, 119, 242, 0.25) !important;
+    }
+
+    .social-btn-fb:hover {
+        background-color: #1465cc !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(24, 119, 242, 0.35) !important;
+    }
+
+    .social-btn-ig {
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 10px rgba(220, 39, 67, 0.25) !important;
+    }
+
+    .social-btn-ig:hover {
+        color: #ffffff !important;
+        opacity: 0.95;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(220, 39, 67, 0.35) !important;
+    }
+
+    /* Иконки в Input полетата */
+    .input-group-text-fb {
+        background-color: #e7f3ff !important;
+        color: #1877F2 !important;
+        border-color: #dee2e6 !important;
+    }
+
+    .input-group-text-ig {
+        background-color: #fcebf2 !important;
+        color: #d62976 !important;
+        border-color: #dee2e6 !important;
+    }
+
+    /* Автоматично разтягане на Django input полетата в input-group */
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        flex: 1 1 auto !important;
+        width: 1% !important;
+        min-width: 0 !important;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        {% if is_own_profile %}
+            <!-- Редакция на личния профил -->
+            <div class="card shadow-sm border-0 p-4 rounded-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold text-primary mb-0">⚙️ Моят профил</h3>
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">
+                        ⭐ {{ avg_rating|default:"0.0"|floatformat:1 }} / 5 ({{ reviews.count }} отзива)
+                    </span>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="d-flex align-items-center mb-4">
+                        {% if user_obj.profile.avatar %}
+                            <img src="{{ user_obj.profile.avatar.url }}" class="rounded-circle me-3 object-fit-cover shadow-sm" style="width: 80px; height: 80px;" alt="Avatar">
+                        {% else %}
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-3 me-3 shadow-sm text-uppercase" style="width: 80px; height: 80px;">
+                                {{ user_obj.username.0 }}
+                            </div>
+                        {% endif %}
+
+                        <div>
+                            <label class="form-label fw-bold mb-1">Промяна на аватар</label>
+                            {{ p_form.avatar }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Име</label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Фамилия</label>
+                            {{ u_form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Потребителско име</label>
+                            {{ u_form.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Имейл адрес</label>
+                            {{ u_form.email }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Телефон за връзка</label>
+                            {{ p_form.phone_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Автомобил (Марка/Модел)</label>
+                            {{ p_form.car_model }}
+                        </div>
+                    </div>
+
+                    <!-- Социални мрежи (Input полета с разширена ширина) -->
+                    <div class="row g-3 mb-3 pt-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Facebook профил</label>
+                            <div class="input-group w-100">
+                                <span class="input-group-text input-group-text-fb">
+                                    <i class="fa-brands fa-facebook-f fs-5"></i>
+                                </span>
+                                {{ p_form.facebook_url }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Instagram профил</label>
+                            <div class="input-group w-100">
+                                <span class="input-group-text input-group-text-ig">
+                                    <i class="fa-brands fa-instagram fs-5"></i>
+                                </span>
+                                {{ p_form.instagram_url }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-gt-primary w-100 py-2 mt-2">Запази промените</button>
+                </form>
+            </div>
+
+        {% else %}
+            <!-- Публичен профил на друг потребител -->
+            <div class="card shadow-sm border-0 p-4 rounded-4 mb-4">
+                <div class="d-flex align-items-center mb-4">
+                    {% if user_obj.profile.avatar %}
+                        <img src="{{ user_obj.profile.avatar.url }}" class="rounded-circle me-3 object-fit-cover shadow" style="width: 80px; height: 80px;" alt="Avatar">
+                    {% else %}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-3 me-3 shadow text-uppercase" style="width: 80px; height: 80px;">
+                            {{ user_obj.username.0 }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h3 class="fw-bold mb-0 text-dark">{{ user_obj.get_full_name|default:user_obj.username }}</h3>
+                        <p class="text-muted small mb-1">@{{ user_obj.username }}</p>
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-1 rounded-pill">
+                            ⭐ {{ avg_rating|default:"0.0"|floatformat:1 }} / 5 ({{ reviews.count }} отзива)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row g-3 border-top pt-3">
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">Имейл</span>
+                        <strong>{{ user_obj.email|default:"Не е посочен" }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted small d-block">Телефон за връзка</span>
+                        <strong>{{ user_obj.profile.phone_number|default:"Не е посочен" }}</strong>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <span class="text-muted small d-block">Автомобил</span>
+                        <strong>{{ user_obj.profile.car_model|default:"Няма въведен автомобил" }}</strong>
+                    </div>
+                </div>
+
+                <!-- Социални мрежи (Бранд бутони) -->
+                {% if user_obj.profile.facebook_url or user_obj.profile.instagram_url %}
+                    <div class="d-flex flex-wrap gap-3 mt-4 pt-3 border-top">
+                        {% if user_obj.profile.facebook_url %}
+                            <a href="{{ user_obj.profile.facebook_url }}" target="_blank" rel="noopener noreferrer" class="social-btn social-btn-fb">
+                                <i class="fa-brands fa-facebook-f fs-5"></i>
+                                Facebook профил
+                            </a>
+                        {% endif %}
+                        {% if user_obj.profile.instagram_url %}
+                            <a href="{{ user_obj.profile.instagram_url }}" target="_blank" rel="noopener noreferrer" class="social-btn social-btn-ig">
+                                <i class="fa-brands fa-instagram fs-5"></i>
+                                Instagram профил
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Публикувани пътувания -->
+        <div class="card shadow-sm border-0 p-4 rounded-4 mb-4">
+            <h5 class="fw-bold mb-3 text-primary">🚗 Публикувани пътувания</h5>
+            {% if driver_rides %}
+                <div class="list-group list-group-flush">
+                    {% for ride in driver_rides %}
+                        <a href="{% url 'ride_detail' ride.pk %}" class="list-group-item list-group-item-action px-0 border-0 d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <strong class="text-dark fs-6">{{ ride.origin }} ➔ {{ ride.destination }}</strong>
+                                <span class="text-muted small d-block">📅 {{ ride.departure_time|date:"d M Y, H:i" }} ч.</span>
+                            </div>
+                            <span class="badge rounded-pill bg-success fs-6 px-3 py-2">{{ ride.price_per_seat }} €</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted small mb-0">Няма намерени публикувани пътувания.</p>
+            {% endif %}
+        </div>
+
+        <!-- Отзиви -->
+        <div id="reviews" class="card shadow-sm border-0 p-4 rounded-4 mb-4">
+            <h5 class="fw-bold mb-3 text-primary">💬 Отзиви от пътници</h5>
+            {% if reviews %}
+                <div class="list-group list-group-flush">
+                    {% for r in reviews %}
+                        <div class="list-group-item px-0 border-0 mb-3 border-bottom pb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="d-flex align-items-center">
+                                    {% if r.reviewer.profile.avatar %}
+                                        <img src="{{ r.reviewer.profile.avatar.url }}" class="rounded-circle me-2 object-fit-cover shadow-sm" style="width: 32px; height: 32px;" alt="Avatar">
+                                    {% else %}
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2 shadow-sm text-uppercase fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                            {{ r.reviewer.username.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <strong>{{ r.reviewer.get_full_name|default:r.reviewer.username }}</strong>
+                                </div>
+                                <span class="text-warning fw-bold fs-6">{{ r.rating }} ★</span>
+                            </div>
+                            {% if r.comment %}
+                                <p class="text-muted small mb-1 mt-2 ps-4">{{ r.comment }}</p>
+                            {% endif %}
+                            <span class="text-black-50 ps-4 d-block" style="font-size: 0.75rem;">{{ r.created_at|date:"d M Y, H:i" }} ч.</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted small mb-0">Все още няма оставени отзиви.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

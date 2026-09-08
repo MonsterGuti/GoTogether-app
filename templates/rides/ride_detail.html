@@ -1,0 +1,504 @@
+{% extends 'rides/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        .chat-box {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .chat-message-bubble {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center px-2 px-md-0">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm border-0 p-3 p-sm-4 mb-4 rounded-4 bg-white">
+
+                <!-- Хедър: Маршрут и Цена -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+                    <h3 class="fw-bold m-0 text-dark fs-4 fs-sm-3 d-flex align-items-center gap-2">
+                        <span>{{ ride.origin }}</span>
+                        <i class="fa-solid fa-arrow-right-long text-muted fs-5"></i>
+                        <span>{{ ride.destination }}</span>
+                    </h3>
+                    <div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-bold rounded-pill shadow-sm">
+                            {{ ride.price_per_seat }} €
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="my-2 my-sm-3">
+
+                <!-- Информация за час и места -->
+                <div class="row g-3 my-1">
+                    <div class="col-12 col-sm-6">
+                        <span class="text-muted small d-block mb-1">
+                            <i class="fa-regular fa-calendar text-primary me-1"></i> Дата и час
+                        </span>
+                        <strong class="fs-6 text-dark">{{ ride.departure_time|date:"d M Y, H:i" }} ч.</strong>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <span class="text-muted small d-block mb-1">
+                            <i class="fa-solid fa-user-group text-primary me-1"></i> Свободни места
+                        </span>
+                        <strong class="fs-6 text-success">{{ ride.available_seats }} места</strong>
+                    </div>
+                </div>
+
+                <!-- 🗺️ БЛОК ЗА КАРТАТА НА МАРШРУТА -->
+                <div class="mt-4 pt-3 border-top">
+                    <h5 class="fw-bold text-dark mb-3 fs-6 fs-sm-5 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-primary"></i> Карта на маршрута
+                    </h5>
+                    <div id="route-map" style="height: 350px; width: 100%; border-radius: 16px;"
+                         class="shadow-sm border"></div>
+                </div>
+
+                <!-- Шофьор -->
+                <div class="d-flex align-items-center mt-3 mt-sm-4 pt-3 border-top">
+                    {% if ride.driver.profile.image %}
+                        <img src="{{ ride.driver.profile.image.url }}"
+                             class="rounded-circle me-3 object-fit-cover shadow-sm flex-shrink-0 border"
+                             style="width: 48px; height: 48px;" alt="Avatar">
+                    {% elif ride.driver.profile.avatar %}
+                        <img src="{{ ride.driver.profile.avatar.url }}"
+                             class="rounded-circle me-3 object-fit-cover shadow-sm flex-shrink-0 border"
+                             style="width: 48px; height: 48px;" alt="Avatar">
+                    {% elif ride.driver.profile.profile_picture %}
+                        <img src="{{ ride.driver.profile.profile_picture.url }}"
+                             class="rounded-circle me-3 object-fit-cover shadow-sm flex-shrink-0 border"
+                             style="width: 48px; height: 48px;" alt="Avatar">
+                    {% else %}
+                        <div class="me-3 rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5 text-uppercase shadow-sm flex-shrink-0"
+                             style="width: 48px; height: 48px;">
+                            {{ ride.driver.username.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="text-truncate">
+                        <span class="text-muted small d-block">Шофьор</span>
+                        <a href="{% url 'public_profile' ride.driver.username %}"
+                           class="text-decoration-none text-dark">
+                            <strong class="fs-6 text-truncate d-block fw-semibold">
+                                {{ ride.driver.get_full_name|default:ride.driver.username }}
+                            </strong>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Пътници и Заявки -->
+                <div id="participants-section" class="mt-4 pt-3 border-top">
+                    <h5 class="fw-bold text-dark mb-3 fs-6 fs-sm-5 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-users text-primary"></i> Пътници и Заявки
+                    </h5>
+                    {% if bookings %}
+                        <ul class="list-group list-group-flush">
+                            {% for b in bookings %}
+                                {% if b.status|upper != 'CANCELLED' and b.status|upper != 'REJECTED' %}
+                                    <li class="list-group-item d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between px-0 border-0 mb-2 gap-2 bg-transparent">
+                                        <div class="d-flex align-items-center w-100 w-sm-auto text-truncate">
+                                            {% if b.passenger.profile.image %}
+                                                <img src="{{ b.passenger.profile.image.url }}"
+                                                     class="rounded-circle me-3 object-fit-cover shadow-sm flex-shrink-0 border"
+                                                     style="width: 38px; height: 38px;" alt="Avatar">
+                                            {% elif b.passenger.profile.avatar %}
+                                                <img src="{{ b.passenger.profile.avatar.url }}"
+                                                     class="rounded-circle me-3 object-fit-cover shadow-sm flex-shrink-0 border"
+                                                     style="width: 38px; height: 38px;" alt="Avatar">
+                                            {% elif b.passenger.profile.profile_picture %}
+                                                <img src="{{ b.passenger.profile.profile_picture.url }}"
+                                                     class="rounded-circle me-3 object-fit-cover shadow-sm flex-shrink-0 border"
+                                                     style="width: 38px; height: 38px;" alt="Avatar">
+                                            {% else %}
+                                                <div class="me-3 rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center text-uppercase shadow-sm flex-shrink-0 fw-bold"
+                                                     style="width: 38px; height: 38px; font-size: 14px;">
+                                                    {{ b.passenger.username.0 }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="text-truncate">
+                                                <a href="{% url 'public_profile' b.passenger.username %}"
+                                                   class="text-decoration-none text-dark">
+                                                    <strong class="d-block text-truncate fw-semibold">
+                                                        {{ b.passenger.get_full_name|default:b.passenger.username }}
+                                                    </strong>
+                                                </a>
+                                                {% if b.status|upper == 'APPROVED' or b.status|upper == 'CONFIRMED' %}
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Потвърден</span>
+                                                {% elif b.status|upper == 'PENDING' %}
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill">Чака одобрение</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if is_driver %}
+                                            {% if b.status|upper == 'PENDING' %}
+                                                <div class="d-flex gap-2 w-100 w-sm-auto mt-2 mt-sm-0 justify-content-end">
+                                                    <a href="{% url 'approve_booking' b.id %}"
+                                                       class="btn btn-sm btn-success rounded-3 px-3 flex-fill flex-sm-grow-0 fw-semibold">Приеми</a>
+                                                    <a href="{% url 'reject_booking' b.id %}"
+                                                       class="btn btn-sm btn-outline-danger rounded-3 px-3 flex-fill flex-sm-grow-0 fw-semibold">Отхвърли</a>
+                                                </div>
+                                            {% elif b.status|upper == 'APPROVED' or b.status|upper == 'CONFIRMED' %}
+                                                <div class="d-flex gap-2 w-100 w-sm-auto mt-2 mt-sm-0 justify-content-end">
+                                                    <a href="{% url 'remove_passenger' b.id %}"
+                                                       class="btn btn-sm btn-outline-danger rounded-3 px-3 flex-fill flex-sm-grow-0 fw-semibold"
+                                                       onclick="return confirm('Сигурни ли сте, че искате да премахнете {{ b.passenger.username }} от пътуването?');">
+                                                        Премахни
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted small mb-0">Все още няма пътници или заявки.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Бутони за действие -->
+                <div class="mt-4 pt-3 border-top">
+                    {% if user.is_authenticated %}
+                        {% if is_driver %}
+                            <div class="alert alert-secondary text-center mb-3 py-2 rounded-3 small">
+                                <i class="fa-solid fa-circle-info me-1"></i> Вие сте шофьорът на това пътуване.
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row gap-2">
+                                <a href="{% url 'edit_ride' ride.pk %}"
+                                   class="btn btn-warning w-100 py-2 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-2 text-dark shadow-sm">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                    <span>Редактирай пътуването</span>
+                                </a>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger w-100 py-2 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-2"
+                                        data-bs-toggle="modal" data-bs-target="#deleteRideModal">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    <span>Изтрий пътуването</span>
+                                </button>
+                            </div>
+                        {% elif user_booking %}
+                            {% if user_booking.status|upper == 'PENDING' %}
+                                <div class="alert alert-warning text-center mb-3 py-2 rounded-3 small">
+                                    Вашата заявка за място чака одобрение от шофьора.
+                                </div>
+                                <form method="POST" action="{% url 'cancel_booking' ride.pk %}" class="mb-2">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn btn-outline-danger w-100 py-2 rounded-3 fw-semibold"
+                                            onclick="return confirm('Сигурни ли сте, че искате да отмените заявката си?');">
+                                        Отмени заявката
+                                    </button>
+                                </form>
+                            {% elif user_booking.status|upper == 'APPROVED' or user_booking.status|upper == 'CONFIRMED' %}
+                                <div class="alert alert-success text-center mb-3 py-2 rounded-3 small">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Имате потвърдено място за това
+                                    пътуване!
+                                </div>
+                                <form method="POST" action="{% url 'cancel_booking' ride.pk %}" class="mb-2">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn btn-outline-danger w-100 py-2 rounded-3 mb-2 fw-semibold"
+                                            onclick="return confirm('Сигурни ли сте, че искате да се откажете от това пътуване?');">
+                                        Откажи резервацията (Напусни пътуването)
+                                    </button>
+                                </form>
+                                <a href="{% url 'add_review' ride.pk %}"
+                                   class="btn btn-warning w-100 py-2 fw-bold text-dark rounded-3 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span>Остави отзив за шофьора</span>
+                                </a>
+                            {% elif user_booking.status|upper == 'REJECTED' %}
+                                <div class="alert alert-danger text-center mb-0 py-2 rounded-3 small">
+                                    Шофьорът ви е премахнал от това пътуване и не можете да изпращате нови заявки.
+                                </div>
+                            {% elif user_booking.status|upper == 'CANCELLED' %}
+                                {% if ride.available_seats > 0 %}
+                                    <form method="POST" action="{% url 'book_ride' ride.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-semibold">
+                                            Заяви място отново
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <div class="alert alert-warning text-center mb-0 py-2 rounded-3 small">
+                                        Няма останали свободни места.
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% elif ride.available_seats > 0 %}
+                            <form method="POST" action="{% url 'book_ride' ride.pk %}">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-primary w-100 py-2 rounded-3 fw-semibold shadow-sm">
+                                    Заяви място
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning text-center mb-0 py-2 rounded-3 small">
+                                Няма останали свободни места.
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={% url 'ride_detail' ride.pk %}"
+                           class="btn btn-primary w-100 py-2 rounded-3 fw-semibold">
+                            Влезте в профила си, за да резервирате
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Модал за изтриване на пътуване -->
+            {% if is_driver %}
+                <div class="modal fade" id="deleteRideModal" tabindex="-1" aria-labelledby="deleteRideModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow rounded-4">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold text-danger" id="deleteRideModalLabel">Потвърждение за
+                                    изтриване</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Сигурни ли сте, че искате да изтриете пътуването от <strong>{{ ride.origin }}</strong>
+                                до <strong>{{ ride.destination }}</strong>?
+                                <br><small class="text-muted">Това действие ще премахне пътуването и за всички
+                                регистрирани пътници.</small>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold"
+                                        data-bs-dismiss="modal">
+                                    Отказ
+                                </button>
+
+                                <form method="POST" action="{% url 'delete_ride' ride.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Да, изтрий
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Чат секция -->
+            {% if is_participant %}
+                <div id="chat-section" class="card shadow-sm border-0 p-3 p-sm-4 rounded-4 mb-4 bg-white">
+                    <h5 class="fw-bold mb-3 text-dark fs-5 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-comments text-primary"></i> Общ чат на пътуването
+                    </h5>
+
+                    <div id="chat-box" class="chat-box p-3 mb-3 border overflow-auto" style="max-height: 380px;">
+                    </div>
+
+                    <form id="chat-form" method="POST" action="{% url 'send_message_ajax' ride.pk %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ message_form.content }}
+                            <button class="btn btn-primary px-3 px-sm-4 fw-semibold d-inline-flex align-items-center gap-2"
+                                    type="submit">
+                                <span>Изпрати</span>
+                                <i class="fa-solid fa-paper-plane extra-small"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const mapElement = document.getElementById('route-map');
+            if (mapElement) {
+                const origin = "{{ ride.origin }}";
+                const destination = "{{ ride.destination }}";
+
+                const map = L.map('route-map').setView([42.7339, 25.4858], 7);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                async function fetchCoords(city) {
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)},Bulgaria`);
+                        const data = await response.json();
+                        if (data && data.length > 0) {
+                            return [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+                        }
+                    } catch (e) {
+                        console.error("Грешка при намиране на координатите за:", city, e);
+                    }
+                    return null;
+                }
+
+                async function loadRealRoute() {
+                    const startCoords = await fetchCoords(origin);
+                    const endCoords = await fetchCoords(destination);
+
+                    if (startCoords && endCoords) {
+                        const startMarker = L.marker([startCoords[1], startCoords[0]]).addTo(map).bindPopup(`<b>Начало:</b> ${origin}`).openPopup();
+                        const endMarker = L.marker([endCoords[1], endCoords[0]]).addTo(map).bindPopup(`<b>Крайна точка:</b> ${destination}`);
+
+                        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${startCoords[0]},${startCoords[1]};${endCoords[0]},${endCoords[1]}?overview=full&geometries=geojson`;
+
+                        try {
+                            const res = await fetch(osrmUrl);
+                            const data = await res.json();
+
+                            if (data.routes && data.routes.length > 0) {
+                                const routeGeoJSON = data.routes[0].geometry;
+                                const routeLayer = L.geoJSON(routeGeoJSON, {
+                                    style: {
+                                        color: '#0d6efd',
+                                        weight: 6,
+                                        opacity: 0.8
+                                    }
+                                }).addTo(map);
+
+                                map.fitBounds(routeLayer.getBounds(), {padding: [40, 40]});
+                            }
+                        } catch (err) {
+                            console.error("Грешка при извличане на шосейния маршрут:", err);
+                            const fallbackLine = L.polyline([[startCoords[1], startCoords[0]], [endCoords[1], endCoords[0]]], {color: '#dc3545'}).addTo(map);
+                            map.fitBounds(fallbackLine.getBounds(), {padding: [40, 40]});
+                        }
+                    }
+                }
+
+                loadRealRoute();
+            }
+
+            {% if is_participant %}
+                const rideId = "{{ ride.pk }}";
+                const chatForm = document.getElementById("chat-form");
+                const chatBox = document.getElementById("chat-box");
+                const chatSection = document.getElementById("chat-section");
+                const inputField = chatForm ? chatForm.querySelector("input[name='content']") : null;
+                let lastMessageCount = -1;
+
+                if (window.location.hash === "#chat-box" || window.location.hash === "#chat-section") {
+                    if (chatSection) {
+                        setTimeout(() => {
+                            chatSection.scrollIntoView({behavior: 'smooth', block: 'end'});
+                            if (inputField) inputField.focus();
+                        }, 300);
+                    }
+                }
+
+                function renderMessage(msg) {
+                    if (msg.content.startsWith("🤖 [Система]:")) {
+                        const systemText = msg.content.replace("🤖 [Система]:", "").trim();
+                        return `
+                            <div class="text-center my-2">
+                                <span class="badge bg-light text-muted border fw-normal px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.8rem;">
+                                    🤖 ${systemText} <span class="text-black-50 ms-1">(${msg.created_at})</span>
+                                </span>
+                            </div>
+                        `;
+                    }
+
+                    const profileUrl = `/profile/${msg.sender_username}/`;
+
+                    const avatarHtml = msg.avatar_url
+                        ? `<a href="${profileUrl}"><img src="${msg.avatar_url}" class="rounded-circle me-2 object-fit-cover shadow-sm flex-shrink-0 border" style="width: 34px; height: 34px;" alt="Avatar"></a>`
+                        : `<a href="${profileUrl}" class="text-decoration-none"><div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 shadow-sm flex-shrink-0 text-uppercase fw-bold" style="width: 34px; height: 34px; font-size: 13px;">${msg.sender_initial}</div></a>`;
+
+                    return `
+                        <div class="d-flex align-items-start mb-3">
+                            ${avatarHtml}
+                            <div class="p-2.5 p-sm-3 rounded-3 chat-message-bubble border text-break" style="max-width: 82%;">
+                                <div class="small fw-bold border-bottom pb-1 mb-1.5 text-muted d-flex justify-content-between align-items-center gap-3">
+                                    <a href="${profileUrl}" class="text-decoration-none text-dark fw-bold">
+                                        ${msg.sender_name}
+                                    </a>
+                                    <span class="fw-normal text-muted extra-small">${msg.created_at}</span>
+                                </div>
+                                <div class="text-dark fs-6">${msg.content}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                function fetchMessages() {
+                    fetch(`/ride/${rideId}/messages/fetch/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (data.messages.length !== lastMessageCount) {
+                                    if (data.messages.length === 0) {
+                                        chatBox.innerHTML = '<p class="text-muted text-center my-3 small">Няма съобщения. Започнете разговора!</p>';
+                                    } else {
+                                        chatBox.innerHTML = data.messages.map(renderMessage).join('');
+                                    }
+                                    chatBox.scrollTop = chatBox.scrollHeight;
+                                    lastMessageCount = data.messages.length;
+                                }
+                            }
+                        })
+                        .catch(error => console.error("Грешка при извличане на съобщенията:", error));
+                }
+
+                if (chatForm) {
+                    chatForm.addEventListener("submit", function (e) {
+                        e.preventDefault();
+
+                        const messageText = inputField.value.trim();
+                        if (!messageText) return;
+
+                        const formData = new FormData(chatForm);
+
+                        fetch(chatForm.action, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "X-Requested-With": "XMLHttpRequest"
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    inputField.value = "";
+                                    fetchMessages();
+                                }
+                            })
+                            .catch(error => console.error("Грешка при изпращането:", error));
+                    });
+                }
+
+                fetchMessages();
+                setInterval(fetchMessages, 3000);
+            {% endif %}
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.location.hash === "#participants-section") {
+                const section = document.getElementById("participants-section");
+                if (section) {
+                    setTimeout(() => {
+                        section.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }, 300);
+                }
+            }
+        });
+    </script>
+{% endblock %}

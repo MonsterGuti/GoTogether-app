@@ -1,0 +1,126 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-4 p-4">
+            <div class="text-center mb-4">
+                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                    <i class="fa-solid fa-user-plus fs-4"></i>
+                </div>
+                <h3 class="fw-bold">Регистрация</h3>
+                <p class="text-muted small">Създайте своя профил за споделено пътуване</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Потребителско име -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-muted">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Име и Фамилия -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">{{ form.first_name.label }}</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">{{ form.last_name.label }}</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Имейл адрес -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-muted">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Телефон и Автомобил -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">{{ form.phone_number.label }}</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">{{ form.car_model.label }}</label>
+                        {{ form.car_model }}
+                        {% if form.car_model.errors %}
+                            <div class="text-danger small mt-1">{{ form.car_model.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Парола и Повтори паролата -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">{{ form.password1.label }}</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">{{ form.password2.label }}</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Профилна снимка -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small text-muted">{{ form.avatar.label }}</label>
+                    {{ form.avatar }}
+                    {% if form.avatar.errors %}
+                        <div class="text-danger small mt-1">{{ form.avatar.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Социални мрежи -->
+                <div class="bg-light p-3 rounded-3 mb-4 border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold small">Социални мрежи</span>
+                        <span class="badge bg-secondary-subtle text-secondary fw-normal small">По желание</span>
+                    </div>
+                    <p class="text-muted small mb-3">💡 Добавянето на профил увеличава доверието от страна на останалите пътуващи.</p>
+                    
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-primary"><i class="fa-brands fa-facebook-f"></i></span>
+                            {{ form.facebook_url }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-danger"><i class="fa-brands fa-instagram"></i></span>
+                            {{ form.instagram_url }}
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3">Създай профил</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

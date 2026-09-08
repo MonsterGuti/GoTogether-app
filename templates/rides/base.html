@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}GoTogether — Споделени пътувания{% endblock %}</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <!-- Шрифтове -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3.2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome (За иконките) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Персонализиран CSS -->
+    <link rel="stylesheet" href="{% static 'rides/css/style.css' %}?v=2">
+
+    <style>
+        /* Плавно скролиране при клик върху линкове с котва (#chat-box, #reviews) */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom mb-4 shadow-sm">
+    <div class="container">
+        <!-- Лого -->
+        <a href="{% url 'home' %}" class="brand-logo me-auto me-lg-4">GoTogether<span class="dot">.</span></a>
+
+        <!-- Хамбургер бутон -->
+        <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Меню съдържание -->
+        <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContent">
+            {% if user.is_authenticated %}
+                <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 gap-lg-3 ms-auto">
+
+                    <!-- 1. Пусни пътуване -->
+                    <a href="{% url 'create_ride' %}" class="btn btn-gt-accent btn-sm d-inline-flex align-items-center justify-content-start justify-content-lg-center gap-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Пусни пътуване</span>
+                    </a>
+
+                    <!-- 2. Моите пътувания -->
+                    <a href="{% url 'my_rides' %}" class="btn btn-gt-outline btn-sm d-inline-flex align-items-center justify-content-start justify-content-lg-center gap-2">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Моите пътувания</span>
+                    </a>
+
+                    <!-- 3. Известия -->
+                    <a href="{% url 'notifications_list' %}" id="notification-bell"
+                       class="btn btn-gt-outline btn-sm d-inline-flex align-items-center justify-content-between justify-content-lg-center position-relative"
+                       title="Известия">
+                        <span class="d-inline-flex align-items-center gap-2">
+                            <i class="fa-solid fa-bell"></i> Известия
+                        </span>
+                        {% if unread_notifications_count > 0 %}
+                            <span id="notification-badge" class="badge rounded-pill bg-danger ms-2">
+                                {{ unread_notifications_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <!-- 4. Профил -->
+                    <a href="{% url 'profile' %}"
+                       class="btn btn-gt-outline btn-sm d-inline-flex align-items-center justify-content-start justify-content-lg-center text-truncate gap-2">
+                        {% if user.profile.image %}
+                            <img src="{{ user.profile.image.url }}"
+                                 class="rounded-circle object-fit-cover flex-shrink-0 border"
+                                 style="width: 24px; height: 24px;" alt="Avatar">
+                        {% elif user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}"
+                                 class="rounded-circle object-fit-cover flex-shrink-0 border"
+                                 style="width: 24px; height: 24px;" alt="Avatar">
+                        {% elif user.profile.profile_picture %}
+                            <img src="{{ user.profile.profile_picture.url }}"
+                                 class="rounded-circle object-fit-cover flex-shrink-0 border"
+                                 style="width: 24px; height: 24px;" alt="Avatar">
+                        {% else %}
+                            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center flex-shrink-0 text-uppercase fw-bold shadow-sm"
+                                 style="width: 24px; height: 24px; font-size: 11px;">
+                                {{ user.username.0 }}
+                            </div>
+                        {% endif %}
+                        <span class="text-truncate">{{ user.get_full_name|default:user.username }}</span>
+                    </a>
+
+                    <!-- 5. Изход -->
+                    <form method="POST" action="{% url 'logout' %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-gt-outline btn-sm w-100 text-start text-lg-center d-inline-flex align-items-center gap-2 justify-content-center">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Изход</span>
+                        </button>
+                    </form>
+
+                </div>
+            {% else %}
+                <div class="d-flex flex-column flex-lg-row gap-2 ms-auto pt-2 pt-lg-0">
+                    <a href="{% url 'login' %}" class="btn btn-gt-login btn-sm">Вход</a>
+                    <a href="{% url 'register' %}" class="btn btn-gt-primary btn-sm">Регистрация</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <!-- Flash Messages -->
+    {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm rounded-3 mb-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<!-- JS Skripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+{% if user.is_authenticated %}
+    <script>
+        function checkUnreadNotifications() {
+            fetch("{% url 'unread_count_api' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.unread_count;
+                    let badge = document.getElementById('notification-badge');
+                    const bell = document.getElementById('notification-bell');
+
+                    if (count > 0) {
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.id = 'notification-badge';
+                            badge.className = 'badge rounded-pill bg-danger ms-2';
+                            bell.appendChild(badge);
+                        }
+                        badge.textContent = count;
+                    } else if (badge) {
+                        badge.remove();
+                    }
+                })
+                .catch(err => console.error("Грешка при проверка на известията:", err));
+        }
+
+        setInterval(checkUnreadNotifications, 4000);
+    </script>
+{% endif %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
