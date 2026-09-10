@@ -5,7 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <title>{% block title %}GoTogether — Споделени пътувания{% endblock %}</title>
+
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}TakeTheTrip — Споделено пътуване в България{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}TakeTheTrip е водещата платформа за споделени пътувания в България. Намери евтин транспорт или сподели разходите си за гориво лесно, удобно и сигурно.{% endblock %}">
+    <meta name="keywords" content="споделено пътуване, споделени пътувания, пътуване, междуградски транспорт, автостоп, TakeTheTrip, такси, спести от гориво">
+    <meta name="author" content="TakeTheTrip Team">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph (OG) Meta Tags (За перфектно превю във Facebook, Viber, Telegram) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}TakeTheTrip — Модерната платформа за споделени пътувания{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Намери или предложи споделено пътуване за броени секунди. Пътувай удобно и спести разходи!{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'rides/images/og-share.jpg' %}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="TakeTheTrip">
+    <meta property="og:locale" content="bg_BG">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}TakeTheTrip — Споделено пътуване{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Сподели пътуване и пътувай по-изгодно из цяла България.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'rides/images/og-share.jpg' %}{% endblock %}">
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -25,7 +46,6 @@
     <link rel="stylesheet" href="{% static 'rides/css/style.css' %}?v=2">
 
     <style>
-        /* Плавно скролиране при клик върху линкове с котва (#chat-box, #reviews) */
         html {
             scroll-behavior: smooth;
         }
@@ -38,7 +58,7 @@
 <nav class="navbar navbar-expand-lg navbar-custom mb-4 shadow-sm">
     <div class="container">
         <!-- Лого -->
-        <a href="{% url 'home' %}" class="brand-logo me-auto me-lg-4">GoTogether<span class="dot">.</span></a>
+        <a href="{% url 'home' %}" class="brand-logo me-auto me-lg-4">TakeTheTrip<span class="dot">.</span></a>
 
         <!-- Хамбургер бутон -->
         <button class="navbar-toggler border-0 p-2 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">

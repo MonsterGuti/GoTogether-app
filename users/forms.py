@@ -25,30 +25,30 @@ class UserRegisterForm(UserCreationForm):
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'name@example.com'})
     )
     avatar = forms.ImageField(
-        required=False,
+        required=True,
         label="Профилна снимка",
         widget=forms.FileInput(attrs={'class': 'form-control'})
     )
     phone_number = forms.CharField(
         max_length=20,
-        required=False,
+        required=True,
         label="Телефон за връзка",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '08XXXXXXXX'})
     )
     car_model = forms.CharField(
         max_length=100,
-        required=False,
+        required=True,
         label="Автомобил (Марка/Модел)",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'напр. Mercedes CLK'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'напр. Mercedes S 63'})
     )
     facebook_url = forms.URLField(
         required=False,
-        label="Facebook профил",
+        label="Facebook профил (по желание)",
         widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://facebook.com/your.profile'})
     )
     instagram_url = forms.URLField(
         required=False,
-        label="Instagram профил",
+        label="Instagram профил (по желание)",
         widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://instagram.com/your.username'})
     )
 
@@ -85,12 +85,26 @@ class ProfileUpdateForm(forms.ModelForm):
         model = Profile
         fields = ['avatar', 'phone_number', 'car_model', 'bio', 'facebook_url', 'instagram_url']
         labels = {
+            'avatar': 'Профилна снимка',
+            'phone_number': 'Телефонен номер',
+            'car_model': 'Автомобил (Марка и модел)',
+            'bio': 'За мен',
             'facebook_url': 'Facebook профил (по желание)',
             'instagram_url': 'Instagram профил (по желание)',
         }
         widgets = {
-            'bio': forms.Textarea(attrs={'rows': 3}),
+            'bio': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'avatar': forms.FileInput(attrs={'class': 'form-control'}),
             'facebook_url': forms.URLInput(attrs={'placeholder': 'https://facebook.com/vashiat.profil'}),
             'instagram_url': forms.URLInput(attrs={'placeholder': 'https://instagram.com/vashiat.profil'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['avatar'].required = True
+        self.fields['phone_number'].required = True
+        self.fields['car_model'].required = True
+        self.fields['bio'].required = True
+
+        self.fields['facebook_url'].required = False
+        self.fields['instagram_url'].required = False

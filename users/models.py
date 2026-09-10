@@ -10,22 +10,27 @@ class Profile(models.Model):
     )
     avatar = models.ImageField(
         upload_to='profile_pics/',
-        default='profile_pics/default.png',
-        blank=True,
+        blank=False,
+        null=False,
         verbose_name='Профилна снимка',
     )
     phone_number = models.CharField(
-        max_length=20, blank=True, verbose_name='Телефонен номер'
+        max_length=20,
+        blank=False,
+        null=False,
+        verbose_name='Телефонен номер'
     )
     car_model = models.CharField(
         max_length=100,
-        blank=True,
+        blank=False,
+        null=False,
         verbose_name='Автомобил (Марка и модел)',
-        help_text='напр. Mercedes-Benz CLK 320',
+        help_text='напр. Mercedes-Benz S 63',
     )
     bio = models.TextField(
         max_length=500,
-        blank=True,
+        blank=False,
+        null=False,
         verbose_name='За мен',
         help_text='Кратко описание за теб като шофьор или пътник',
     )

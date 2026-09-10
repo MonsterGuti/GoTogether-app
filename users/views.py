@@ -33,13 +33,13 @@ def register(request):
             login(request, user)
 
             if user.email:
-                subject = 'Добре дошли в GoTogether!'
+                subject = 'Добре дошли в TakeTheTrip!'
                 message = (
                     f'Здравейте, {user.username}!\n\n'
-                    f'Благодарим ви, че се регистрирахте в GoTogether. '
+                    f'Благодарим ви, че се регистрирахте в TakeTheTrip. '
                     f'Сега можете да споделяте пътуванията си или да намерите удобен транспорт.\n\n'
                     f'Желаем ви приятни и безаварийни пътувания!\n\n'
-                    f'Поздрави,\nЕкипът на GoTogether'
+                    f'Поздрави,\nЕкипът на TakeTheTrip'
                 )
                 send_mail(
                     subject=subject,

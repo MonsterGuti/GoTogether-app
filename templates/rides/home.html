@@ -1,6 +1,15 @@
 {% extends 'rides/base.html' %}
 {% load static %}
 
+<!-- SEO заглавие и описание за началната страница -->
+{% block title %}TakeTheTrip — Споделени пътувания и изгодно пътуване в България{% endblock %}
+
+{% block meta_description %}Намери или предложи споделено пътуване в България. Спести от гориво, пътувай удобно и намери спътници с TakeTheTrip.{% endblock %}
+
+{% block og_title %}TakeTheTrip — Намери или предложи споделено пътуване{% endblock %}
+
+{% block og_description %}Пътувай изгодно из цяла България. Свържи се с шофьори и пътници бързо, лесно и сигурно.{% endblock %}
+
 {% block extra_css %}
 <style>
     .hero-search-card {
@@ -15,23 +24,41 @@
         box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
     }
 </style>
+
+<!-- Structured Data (JSON-LD) за Google Search -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "TakeTheTrip",
+  "url": "{{ request.scheme }}://{{ request.get_host }}/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ request.scheme }}://{{ request.get_host }}/?origin={origin_query}&destination={destination_query}",
+    "query-input": "required name=origin_query"
+  }
+}
+</script>
 {% endblock %}
 
 {% block content %}
 <!-- Hero Секция и Търсачка -->
 <div class="row justify-content-center my-4">
     <div class="col-lg-10">
-        <div class="card hero-search-card shadow-lg border-0 rounded-4 p-4 p-md-5 text-center">
+        <main class="card hero-search-card shadow-lg border-0 rounded-4 p-4 p-md-5 text-center">
 
             <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3 mx-auto" style="width: 64px; height: 64px;">
                 <i class="fa-solid fa-compass fs-2"></i>
             </div>
 
-            <h2 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Намери следващото си пътуване</h2>
-            <p class="text-muted mb-4 fs-6">Сподели разходите и пътувай бързо и изгодно</p>
+            <!-- Главен H1 таг - ключов за SEO класирането -->
+            <h1 class="fw-bold text-dark mb-2 fs-2" style="letter-spacing: -0.5px;">
+                Споделено пътуване в България с TakeTheTrip
+            </h1>
+            <p class="text-muted mb-4 fs-6">Намери следващото си пътуване, сподели разходите и пътувай бързо и изгодно</p>
 
             <div class="search-container">
-                <form method="GET" action="{% url 'home' %}" class="row g-2 align-items-center">
+                <form method="GET" action="{% url 'home' %}" class="row g-2 align-items-center" role="search">
 
                     <!-- Откъде -->
                     <div class="col-md-3">
@@ -40,7 +67,7 @@
                                 <i class="fa-solid fa-location-dot"></i>
                             </span>
                             <input type="text" name="origin" value="{{ origin_query }}"
-                                   class="form-control bg-white border-start-0 py-2" placeholder="Откъде тръгваш?">
+                                   class="form-control bg-white border-start-0 py-2" placeholder="Откъде тръгваш?" aria-label="Градоустройство/Начална точка">
                         </div>
                     </div>
 
@@ -51,7 +78,7 @@
                                 <i class="fa-solid fa-location-arrow"></i>
                             </span>
                             <input type="text" name="destination" value="{{ destination_query }}"
-                                   class="form-control bg-white border-start-0 py-2" placeholder="Накъде отиваш?">
+                                   class="form-control bg-white border-start-0 py-2" placeholder="Накъде отиваш?" aria-label="Дестинация">
                         </div>
                     </div>
 
@@ -62,7 +89,7 @@
                                 <i class="fa-solid fa-calendar-days"></i>
                             </span>
                             <input type="date" name="date" value="{{ date_query }}"
-                                   class="form-control bg-white border-start-0 py-2">
+                                   class="form-control bg-white border-start-0 py-2" aria-label="Дата на пътуване">
                         </div>
                     </div>
 
@@ -77,19 +104,19 @@
                 </form>
             </div>
 
-        </div>
+        </main>
     </div>
 </div>
 
 <!-- Списък с пътувания -->
-<div class="row justify-content-center mt-4">
+<section class="row justify-content-center mt-4">
     <div class="col-lg-10">
 
         <!-- Хедър на списъка -->
         <div class="d-flex justify-content-between align-items-center mb-3 px-1">
-            <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+            <h2 class="fw-bold text-dark m-0 fs-5 d-flex align-items-center gap-2">
                 <i class="fa-solid fa-car-side text-primary"></i> Предстоящи маршрути
-            </h5>
+            </h2>
             <span class="badge bg-secondary-subtle text-secondary border px-3 py-2 rounded-pill fw-medium">
                 {{ rides|length }} намерени
             </span>
@@ -99,15 +126,15 @@
             {% for ride in rides %}
                 <div class="col-md-6">
                     <a href="{% if user.is_authenticated %}{% url 'ride_detail' ride.pk %}{% else %}{% url 'login' %}?next={% url 'ride_detail' ride.pk %}{% endif %}" class="text-decoration-none text-dark d-block">
-                        <div class="card ride-card p-3 border-0 shadow-sm rounded-4 bg-white h-100">
+                        <article class="card ride-card p-3 border-0 shadow-sm rounded-4 bg-white h-100">
 
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div>
-                                    <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2" style="letter-spacing: -0.3px;">
+                                    <h3 class="fw-bold text-dark mb-1 fs-5 d-flex align-items-center gap-2" style="letter-spacing: -0.3px;">
                                         <span>{{ ride.origin }}</span>
                                         <i class="fa-solid fa-arrow-right-long text-muted fs-6"></i>
                                         <span>{{ ride.destination }}</span>
-                                    </h5>
+                                    </h3>
                                 </div>
                                 <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-bold rounded-pill">
                                     {{ ride.price_per_seat }} €
@@ -122,7 +149,7 @@
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
                                 <div class="d-flex align-items-center">
                                     {% if ride.driver.profile.image %}
-                                        <img src="{{ ride.driver.profile.image.url }}" class="rounded-circle me-2 object-fit-cover shadow-sm border" style="width: 32px; height: 32px;" alt="Avatar">
+                                        <img src="{{ ride.driver.profile.image.url }}" class="rounded-circle me-2 object-fit-cover shadow-sm border" style="width: 32px; height: 32px;" alt="Шофьор {{ ride.driver.get_full_name|default:ride.driver.username }}">
                                     {% else %}
                                         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 shadow-sm text-uppercase fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
                                             {{ ride.driver.username.0 }}
@@ -139,7 +166,7 @@
                                 </span>
                             </div>
 
-                        </div>
+                        </article>
                     </a>
                 </div>
             {% empty %}
@@ -149,7 +176,7 @@
                         <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle mb-3" style="width: 72px; height: 72px;">
                             <i class="fa-solid fa-car-tunnel fs-1"></i>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">Няма намерени предстоящи пътувания</h4>
+                        <h3 class="fw-bold text-dark mb-2 fs-5">Няма намерени предстоящи пътувания</h3>
                         <p class="text-muted small mb-4">
                             {% if origin_query or destination_query or date_query %}
                                 Няма налични маршрути по избраните критерии. Опитайте с друга дата или дестинация.
@@ -167,5 +194,5 @@
         </div>
 
     </div>
-</div>
+</section>
 {% endblock %}

@@ -62,14 +62,14 @@ def add_review(request, ride_pk):
             )
 
             if ride.driver.email:
-                subject = f'Нов отзив от {reviewer_name} в GoTogether'
+                subject = f'Нов отзив от {reviewer_name} в TakeTheTrip'
                 message = (
                     f'Здравейте, {ride.driver.username}!\n\n'
                     f'Получихте нов отзив за пътуването си:\n'
                     f'Оценка: {review.rating}/5 ★\n'
                     f'Коментар: "{review.comment}"\n\n'
                     f'Можете да прегледате профила си тук: {settings.SITE_URL}/users/profile/\n\n'
-                    f'Поздрави,\nЕкипът на GoTogether'
+                    f'Поздрави,\nЕкипът на TakeTheTrip'
                 )
                 send_mail(
                     subject=subject,

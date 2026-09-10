@@ -46,13 +46,13 @@ def send_notification_email(recipient, subject, message, action_url=None):
         <html>
             <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
                 <div style="max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                    <h2 style="color: #0d6efd; margin-top: 0;">GoTogether</h2>
+                    <h2 style="color: #0d6efd; margin-top: 0;">TakeTheTrip</h2>
                     <p>Здравейте, <strong>{get_user_display_name(recipient)}</strong>!</p>
                     <p>{message}</p>
                     <div style="margin-top: 25px; text-align: center;">
                         <a href="{full_action_url}" 
                            style="background-color: #0d6efd; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                            Към GoTogether ➔
+                            Към TakeTheTrip ➔
                         </a>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ def register(request):
             token = account_activation_token.make_token(user)
             activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
 
-            subject = "Потвърждение на профила ви в GoTogether"
+            subject = "Потвърждение на профила ви в TakeTheTrip"
             email_body = "Благодарим ви за регистрацията! Моля, потвърдете вашия имейл адрес, за да активирате профила си и да използвате услугата."
 
             send_notification_email(
