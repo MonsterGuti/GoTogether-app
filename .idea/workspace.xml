@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="updating settings">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="adding image preview" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -63,6 +61,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "django.template.preview.state": "SHOW_EDITOR_AND_PREVIEW",
     "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/User/Documents/GitHub/tripApp/rides/static/images",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -77,6 +76,9 @@
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\User\Documents\GitHub\tripApp\rides\static\images" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\User\Documents\GitHub\tripApp\templates\users" />
       <recent name="C:\Users\User\Documents\GitHub\tripApp\templates\rides" />
@@ -127,7 +129,7 @@
       <workItem from="1787075825982" duration="7123000" />
       <workItem from="1788189684619" duration="862000" />
       <workItem from="1788190563343" duration="49584000" />
-      <workItem from="1789053121342" duration="7341000" />
+      <workItem from="1789053121342" duration="7745000" />
     </task>
     <task id="LOCAL-00001" summary="SEO optimization">
       <option name="closed" value="true" />
@@ -145,7 +147,15 @@
       <option name="project" value="LOCAL" />
       <updated>1789076734228</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="adding image preview">
+      <option name="closed" value="true" />
+      <created>1789081173463</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1789081173463</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -154,7 +164,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="SEO optimization" />
     <MESSAGE value="updating settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="updating settings" />
+    <MESSAGE value="adding image preview" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding image preview" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
