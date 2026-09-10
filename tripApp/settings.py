@@ -13,8 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+hqoe4rceqvhse$qdlhor5*l1bja&q6u8375y07mp)pa$ulicc')
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1,http://localhost').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '165.22.16.47,127.0.0.1,localhost').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://165.22.16.47,http://127.0.0.1,http://localhost').split(',')
 
 # Application definition
 
@@ -67,10 +67,10 @@ WSGI_APPLICATION = 'tripApp.wsgi.application'
 # Custom User Model
 AUTH_USER_MODEL = 'rides.User'
 
-# Database Configuration (Променено за TakeTheTrip)
+# Database Configuration (Настроено за TakeTheTrip в DigitalOcean)
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"postgres://postgres:marti123@127.0.0.1:5432/takethetrip_db",
+        default="postgres://monsterguti:marti123@127.0.0.1:5432/takethetrip",
         conn_max_age=600
     )
 }
@@ -92,7 +92,6 @@ USE_TZ = True
 # Static & Media files
 STATIC_URL = '/static/'
 
-# Безопасна проверка за съществуване на статичната папка:
 STATIC_DIR = BASE_DIR / 'static'
 STATICFILES_DIRS = [STATIC_DIR] if STATIC_DIR.exists() else []
 
@@ -106,7 +105,7 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Email Configuration (Обновени данни за TakeTheTrip)
+# Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -116,6 +115,6 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'takethetripapp@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'igcbnbnejppuynyz')
 
 DEFAULT_FROM_EMAIL = 'TakeTheTrip <takethetripapp@gmail.com>'
-SITE_URL = 'http://127.0.0.1:8000'
+SITE_URL = 'http://165.22.16.47'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

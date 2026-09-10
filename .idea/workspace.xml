@@ -4,25 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/data_source_mapping.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notifications/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/notifications/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reviews/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/reviews/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rides/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rides/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rides/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/rides/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rides/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/rides/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/rides/ride_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/rides/ride_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/users/password_reset_email.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/users/password_reset_email.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/users/password_reset_subject" beforeDir="false" afterPath="$PROJECT_DIR$/templates/users/password_reset_subject" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tripApp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tripApp/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="SEO optimization" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -143,12 +125,25 @@
       <workItem from="1787075825982" duration="7123000" />
       <workItem from="1788189684619" duration="862000" />
       <workItem from="1788190563343" duration="49584000" />
-      <workItem from="1789053121342" duration="4769000" />
+      <workItem from="1789053121342" duration="5083000" />
     </task>
+    <task id="LOCAL-00001" summary="SEO optimization">
+      <option name="closed" value="true" />
+      <created>1789076311030</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1789076311030</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="SEO optimization" />
+    <option name="LAST_COMMIT_MESSAGE" value="SEO optimization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
