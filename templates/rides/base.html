@@ -18,6 +18,8 @@
     <meta property="og:title" content="{% block og_title %}TakeTheTrip — Модерната платформа за споделени пътувания{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Намери или предложи споделено пътуване за броени секунди. Пътувай удобно и спести разходи!{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'rides/images/og-share.jpg' %}{% endblock %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:site_name" content="TakeTheTrip">
     <meta property="og:locale" content="bg_BG">
