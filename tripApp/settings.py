@@ -5,13 +5,13 @@ Django settings for tripApp project.
 from pathlib import Path
 import os
 import dj_database_url
-
 import environ
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Security & Debug Settings
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+hqoe4rceqvhse$qdlhor5*l1bja&q6u8375y07mp)pa$ulicc')
