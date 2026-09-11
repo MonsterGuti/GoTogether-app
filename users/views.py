@@ -1,3 +1,5 @@
+from datetime import datetime  # ако потрябва
+import threading
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -12,6 +14,26 @@ from .models import Profile
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 
 User = get_user_model()
+
+
+class EmailThread(threading.Thread):
+    def __init__(self, subject, message, recipient_list, from_email=None, html_message=None):
+        self.subject = subject
+        self.message = message
+        self.recipient_list = recipient_list
+        self.from_email = from_email
+        self.html_message = html_message
+        super().__init__()
+
+    def run(self):
+        send_mail(
+            subject=self.subject,
+            message=self.message,
+            from_email=self.from_email,
+            recipient_list=self.recipient_list,
+            html_message=self.html_message,
+            fail_silently=True,
+        )
 
 
 def register(request):
@@ -41,13 +63,13 @@ def register(request):
                     f'Желаем ви приятни и безаварийни пътувания!\n\n'
                     f'Поздрави,\nЕкипът на TakeTheTrip'
                 )
-                send_mail(
+
+                EmailThread(
                     subject=subject,
                     message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[user.email],
-                    fail_silently=True,
-                )
+                    from_email=settings.DEFAULT_FROM_EMAIL
+                ).start()
 
             messages.success(request, f'Успешна регистрация! Добре дошли, {user.username}!')
             return redirect('home')
@@ -82,7 +104,8 @@ def profile(request):
             p_form.fields['avatar'].required = False
 
     driver_rides = Ride.objects.filter(driver=request.user).order_by('-departure_time')
-    reviews = Review.objects.filter(driver=request.user).select_related('reviewer', 'reviewer__profile').order_by('-created_at')
+    reviews = Review.objects.filter(driver=request.user).select_related('reviewer', 'reviewer__profile').order_by(
+        '-created_at')
     avg_rating_val = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
     avg_rating = round(avg_rating_val, 1)
 
@@ -107,7 +130,8 @@ def public_profile(request, username):
     Profile.objects.get_or_create(user=profile_user)
     driver_rides = Ride.objects.filter(driver=profile_user).order_by('-departure_time')
 
-    reviews = Review.objects.filter(driver=profile_user).select_related('reviewer', 'reviewer__profile').order_by('-created_at')
+    reviews = Review.objects.filter(driver=profile_user).select_related('reviewer', 'reviewer__profile').order_by(
+        '-created_at')
     avg_rating_val = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
     avg_rating = round(avg_rating_val, 1)
 
