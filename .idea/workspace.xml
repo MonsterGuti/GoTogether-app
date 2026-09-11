@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="async sending emails">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="creating admin models" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -131,7 +129,7 @@
       <workItem from="1787075825982" duration="7123000" />
       <workItem from="1788189684619" duration="862000" />
       <workItem from="1788190563343" duration="49584000" />
-      <workItem from="1789053121342" duration="10728000" />
+      <workItem from="1789053121342" duration="11104000" />
     </task>
     <task id="LOCAL-00001" summary="SEO optimization">
       <option name="closed" value="true" />
@@ -173,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1789119475244</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="creating admin models">
+      <option name="closed" value="true" />
+      <created>1789119922136</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1789119922136</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -185,7 +191,8 @@
     <MESSAGE value="adding image preview" />
     <MESSAGE value="added image preview" />
     <MESSAGE value="async sending emails" />
-    <option name="LAST_COMMIT_MESSAGE" value="async sending emails" />
+    <MESSAGE value="creating admin models" />
+    <option name="LAST_COMMIT_MESSAGE" value="creating admin models" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
