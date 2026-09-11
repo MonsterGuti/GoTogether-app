@@ -13,8 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+hqoe4rceqvhse$qdlhor5*l1bja&q6u8375y07mp)pa$ulicc')
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '165.22.16.47,127.0.0.1,localhost').split(',')
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://165.22.16.47,http://127.0.0.1,http://localhost').split(',')
+ALLOWED_HOSTS = ['takethetripapp.com', 'www.takethetripapp.com', 'localhost', '127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://takethetripapp.com',
+    'https://www.takethetripapp.com',
+]
 
 # Application definition
 

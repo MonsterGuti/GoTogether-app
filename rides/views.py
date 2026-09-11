@@ -1,5 +1,5 @@
+import threading
 from datetime import datetime
-
 from django.contrib import messages
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -36,8 +36,28 @@ def create_system_chat_message(ride, text):
     )
 
 
+class EmailThread(threading.Thread):
+    def __init__(self, subject, message, recipient_list, from_email=None, html_message=None):
+        self.subject = subject
+        self.message = message
+        self.recipient_list = recipient_list
+        self.from_email = from_email
+        self.html_message = html_message
+        threading.Thread.__init__(self)
+
+    def run(self):
+        send_mail(
+            subject=self.subject,
+            message=self.message,
+            from_email=self.from_email,
+            recipient_list=self.recipient_list,
+            html_message=self.html_message,
+            fail_silently=True,
+        )
+
+
 def send_notification_email(recipient, subject, message, action_url=None):
-    """Изпраща изчистен HTML имейл с единен бутон към сайта."""
+    """Изпраща изчистен HTML имейл асинхронно в заден план."""
     if recipient and recipient.email:
         site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
         full_action_url = f"{site_url}{action_url}" if action_url else site_url
@@ -60,14 +80,13 @@ def send_notification_email(recipient, subject, message, action_url=None):
         </html>
         """
 
-        send_mail(
+        EmailThread(
             subject=subject,
             message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[recipient.email],
-            html_message=html_content,
-            fail_silently=True,
-        )
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            html_message=html_content
+        ).start()
 
 
 def home(request):
