@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="added image preview">
+    <list default="true" id="d4e4e73e-16ae-4879-a15e-bbf2283cdf68" name="Changes" comment="async sending emails">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tripApp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tripApp/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,7 +131,7 @@
       <workItem from="1787075825982" duration="7123000" />
       <workItem from="1788189684619" duration="862000" />
       <workItem from="1788190563343" duration="49584000" />
-      <workItem from="1789053121342" duration="10108000" />
+      <workItem from="1789053121342" duration="10728000" />
     </task>
     <task id="LOCAL-00001" summary="SEO optimization">
       <option name="closed" value="true" />
@@ -166,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1789081363207</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="async sending emails">
+      <option name="closed" value="true" />
+      <created>1789119475244</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1789119475244</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,7 +184,8 @@
     <MESSAGE value="updating settings" />
     <MESSAGE value="adding image preview" />
     <MESSAGE value="added image preview" />
-    <option name="LAST_COMMIT_MESSAGE" value="added image preview" />
+    <MESSAGE value="async sending emails" />
+    <option name="LAST_COMMIT_MESSAGE" value="async sending emails" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
