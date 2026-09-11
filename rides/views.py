@@ -1,5 +1,7 @@
 import threading
 from datetime import datetime
+import os
+import resend
 from django.contrib import messages
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -9,7 +11,6 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 
@@ -19,6 +20,9 @@ from .tokens import account_activation_token
 from notifications.models import Notification
 
 User = get_user_model()
+
+# Инициализиране на Resend API ключа
+resend.api_key = os.getenv("RESEND_API_KEY") or getattr(settings, "RESEND_API_KEY", None)
 
 
 def get_user_display_name(user):
@@ -36,34 +40,8 @@ def create_system_chat_message(ride, text):
     )
 
 
-import traceback
-
-class EmailThread(threading.Thread):
-    def __init__(self, subject, message, recipient_list, from_email=None, html_message=None):
-        self.subject = subject
-        self.message = message
-        self.recipient_list = recipient_list
-        self.from_email = from_email
-        self.html_message = html_message
-        super().__init__()
-
-    def run(self):
-        try:
-            send_mail(
-                subject=self.subject,
-                message=self.message,
-                from_email=self.from_email,
-                recipient_list=self.recipient_list,
-                html_message=self.html_message,
-                fail_silently=False,
-            )
-        except Exception as e:
-            print(f"--- EMAIL ERROR ---: {e}")
-            traceback.print_exc()
-
-
 def send_notification_email(recipient, subject, message, action_url=None):
-    """Изпраща изчистен HTML имейл асинхронно в заден план."""
+    """Изпраща изчистен HTML имейл асинхронно чрез Resend API."""
     if recipient and recipient.email:
         site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
         full_action_url = f"{site_url}{action_url}" if action_url else site_url
@@ -86,13 +64,17 @@ def send_notification_email(recipient, subject, message, action_url=None):
         </html>
         """
 
-        EmailThread(
-            subject=subject,
-            message=message,
-            recipient_list=[recipient.email],
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            html_message=html_content
-        ).start()
+        try:
+            params = {
+                "from": "onboarding@resend.dev",
+                "to": [recipient.email],
+                "subject": subject,
+                "html": html_content,
+            }
+            response = resend.Emails.send(params)
+            print(f"--- RESEND EMAIL SUCCESS ---: {response}")
+        except Exception as e:
+            print(f"--- RESEND EMAIL ERROR ---: {e}")
 
 
 def home(request):
@@ -466,7 +448,6 @@ def edit_ride(request, pk):
         if form.is_valid():
             form.save()
 
-            # Уведомяване на всички потвърдени пътници
             confirmed_bookings = Booking.objects.filter(
                 ride=ride,
                 status__in=['APPROVED', 'approved', 'confirmed', 'CONFIRMED']
@@ -511,7 +492,6 @@ def delete_ride(request, pk):
         return redirect('ride_detail', pk=pk)
 
     if request.method == 'POST':
-        # Уведомяване на всички потвърдени пътници ПРЕДИ изтриването
         confirmed_bookings = Booking.objects.filter(
             ride=ride,
             status__in=['APPROVED', 'approved', 'confirmed', 'CONFIRMED']
@@ -525,7 +505,7 @@ def delete_ride(request, pk):
                 recipient=b.passenger,
                 sender=request.user,
                 notification_type='cancellation',
-                ride=None,  # Пътуването ще бъде изтрито
+                ride=None,
                 message=f"Пътуването от {ride.origin} до {ride.destination} ({departure_str}) беше отменено от шофьора."
             )
 
