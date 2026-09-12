@@ -547,7 +547,8 @@ def send_message_ajax(request, pk):
 
         recipients_ids = set()
         if is_driver:
-            passengers = Booking.objects.filter(ride=ride, status__in=['APPROVED', 'approved', 'confirmed']).values_list(
+            passengers = Booking.objects.filter(ride=ride,
+                                                status__in=['APPROVED', 'approved', 'confirmed']).values_list(
                 'passenger_id', flat=True)
             recipients_ids.update(passengers)
         else:
@@ -652,20 +653,32 @@ def my_rides(request):
         'passenger_past': passenger_past,
     })
 
+
 import requests
 from django.http import JsonResponse
+
+import requests
+from django.http import JsonResponse
+
 
 def proxy_geocode(request):
     city = request.GET.get('q', '')
     if not city:
         return JsonResponse({'error': 'No city provided'}, status=400)
 
-    url = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria"
     headers = {'User-Agent': 'TakeTheTripApp/1.0 (contact@takethetripapp.com)'}
+
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&featureType=settlement&limit=1"
 
     try:
         response = requests.get(url, headers=headers, timeout=5)
         data = response.json()
+
+        if not data:
+            url_fallback = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&limit=1"
+            response = requests.get(url_fallback, headers=headers, timeout=5)
+            data = response.json()
+
         if data:
             return JsonResponse({'lon': float(data[0]['lon']), 'lat': float(data[0]['lat'])})
     except Exception as e:
