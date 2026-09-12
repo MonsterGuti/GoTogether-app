@@ -18,7 +18,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+hqoe4rceqvhse$qdlhor
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['takethetripapp.com', 'www.takethetripapp.com', 'localhost', '127.0.0.1', '165.22.16.47']
-
 CSRF_TRUSTED_ORIGINS = [
     'https://takethetripapp.com',
     'https://www.takethetripapp.com',
