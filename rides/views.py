@@ -66,7 +66,7 @@ def send_notification_email(recipient, subject, message, action_url=None):
 
         try:
             params = {
-                "from": "onboarding@resend.dev",
+                "from": "TakeTheTrip <support@takethetripapp.com>",
                 "to": [recipient.email],
                 "subject": subject,
                 "html": html_content,
@@ -652,6 +652,7 @@ def my_rides(request):
         'passenger_upcoming': passenger_upcoming,
         'passenger_past': passenger_past,
     })
+
 
 import requests
 from django.http import JsonResponse
