@@ -653,30 +653,37 @@ def my_rides(request):
         'passenger_past': passenger_past,
     })
 
-
-import requests
-from django.http import JsonResponse
-
 import requests
 from django.http import JsonResponse
 
 
 def proxy_geocode(request):
-    city = request.GET.get('q', '')
+    city = request.GET.get('q', '').strip()
     if not city:
         return JsonResponse({'error': 'No city provided'}, status=400)
 
     headers = {'User-Agent': 'TakeTheTripApp/1.0 (contact@takethetripapp.com)'}
 
-    url = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&addressdetails=1&limit=1"
+    url = f"https://nominatim.openstreetmap.org/search?format=json&city={city}&country=Bulgaria&limit=1"
+
     try:
         response = requests.get(url, headers=headers, timeout=5)
         data = response.json()
 
         if not data:
-            url_fallback = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&limit=1"
+            url_fallback = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&limit=5"
             response = requests.get(url_fallback, headers=headers, timeout=5)
-            data = response.json()
+            results = response.json()
+
+            for item in results:
+                place_type = item.get('type', '')
+                osm_type = item.get('osm_type', '')
+                if place_type in ['city', 'town', 'village', 'administrative'] and item.get('class') == 'boundary':
+                    continue
+                data = [item]
+                break
+            if not data and results:
+                data = [results[0]]
 
         if data:
             return JsonResponse({'lon': float(data[0]['lon']), 'lat': float(data[0]['lat'])})
