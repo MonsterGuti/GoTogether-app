@@ -57,14 +57,82 @@ def register(request):
                         from_email=settings.DEFAULT_FROM_EMAIL,
                         recipient_list=[user.email],
                         html_message=html_content,
-                        fail_silently=True,
+                        fail_silently=False,
                     )
-                except Exception:
-                    pass
+                    print(f"--- USERS SMTP SUCCESS ---: {user.email}")
+                except Exception as e:
+                    print(f"--- USERS SMTP ERROR ---: {e}")
 
-            messages.success(request, 'Успешна регистрация!')
+            messages.success(request, f'Успешна регистрация! Добре дошли, {user.username}!')
             return redirect('home')
     else:
         form = UserRegisterForm()
 
     return render(request, 'users/register.html', {'form': form})
+
+
+@login_required
+def profile(request):
+    profile_obj, _ = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=profile_obj
+        )
+
+        if profile_obj.avatar:
+            p_form.fields['avatar'].required = False
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, 'Профилът ви беше обновен успешно!')
+            return redirect('profile')
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=profile_obj)
+        if profile_obj.avatar:
+            p_form.fields['avatar'].required = False
+
+    driver_rides = Ride.objects.filter(driver=request.user).order_by('-departure_time')
+    reviews = Review.objects.filter(driver=request.user).select_related('reviewer', 'reviewer__profile').order_by(
+        '-created_at')
+    avg_rating_val = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    avg_rating = round(avg_rating_val, 1)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form,
+        'user_obj': request.user,
+        'is_own_profile': True,
+        'driver_rides': driver_rides,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+    }
+    return render(request, 'users/profile.html', context)
+
+
+def public_profile(request, username):
+    profile_user = get_object_or_404(User, username=username)
+
+    if request.user == profile_user:
+        return redirect('profile')
+
+    Profile.objects.get_or_create(user=profile_user)
+    driver_rides = Ride.objects.filter(driver=profile_user).order_by('-departure_time')
+
+    reviews = Review.objects.filter(driver=profile_user).select_related('reviewer', 'reviewer__profile').order_by(
+        '-created_at')
+    avg_rating_val = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    avg_rating = round(avg_rating_val, 1)
+
+    context = {
+        'profile_user': profile_user,
+        'user_obj': profile_user,
+        'is_own_profile': False,
+        'driver_rides': driver_rides,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+    }
+    return render(request, 'users/profile.html', context)

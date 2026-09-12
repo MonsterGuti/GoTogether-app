@@ -1,3 +1,4 @@
+import threading
 from datetime import datetime
 import os
 from django.contrib import messages
@@ -38,7 +39,7 @@ def create_system_chat_message(ride, text):
 
 
 def send_notification_email(recipient, subject, message, action_url=None):
-    """Изпраща изчистен HTML имейл асинхронно чрез Resend."""
+    """Изпраща изчистен HTML имейл асинхронно чрез Django SMTP."""
     if recipient and recipient.email:
         site_url = getattr(settings, 'SITE_URL', 'http://165.22.16.47')
         full_action_url = f"{site_url}{action_url}" if action_url else site_url
@@ -71,9 +72,9 @@ def send_notification_email(recipient, subject, message, action_url=None):
                 html_message=html_content,
                 fail_silently=False,
             )
-            print(f"--- RIDES RESEND EMAIL SUCCESS ---: {recipient.email}")
+            print(f"--- RIDES SMTP EMAIL SUCCESS ---: {recipient.email}")
         except Exception as e:
-            print(f"--- RIDES RESEND EMAIL ERROR ---: {e}")
+            print(f"--- RIDES SMTP EMAIL ERROR ---: {e}")
 
 
 def home(request):
@@ -110,11 +111,25 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = True
+            user.is_active = False  # Неактивен до потвърждаване на имейла
             user.save()
-            login(request, user)
-            messages.success(request, 'Регистрацията е успешна!')
-            return redirect('home')
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = account_activation_token.make_token(user)
+            activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
+
+            subject = "Потвърждение на профила ви в TakeTheTrip"
+            email_body = "Благодарим ви за регистрацията! Моля, потвърдете вашия имейл адрес, за да активирате профила си и да използвате услугата."
+
+            send_notification_email(
+                recipient=user,
+                subject=subject,
+                message=email_body,
+                action_url=activation_link
+            )
+
+            messages.info(request, 'Регистрацията е успешна! Изпратихме ви имейл с линк за активация на профила.')
+            return redirect('login')
     else:
         form = RegisterForm()
 
@@ -122,7 +137,21 @@ def register(request):
 
 
 def activate(request, uidb64, token):
-    return redirect('home')
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(request, "Профилът ви беше потвърден и активиран успешно!")
+        return redirect('home')
+    else:
+        messages.error(request, "Линкът за потвърждение е невалиден или изтекъл!")
+        return redirect('login')
 
 
 def ride_detail(request, pk):
@@ -196,7 +225,7 @@ def book_ride(request, pk):
         return redirect(f"{reverse('ride_detail', kwargs={'pk': ride.id})}#participants-section")
 
     if request.method == 'POST':
-        Booking.objects.create(
+        booking = Booking.objects.create(
             ride=ride,
             passenger=request.user,
             status='PENDING'
@@ -266,7 +295,7 @@ def approve_booking(request, booking_id):
             action_url=ride_url
         )
 
-        messages.success(request, f"Заявката на {passenger_name} беше одобрена!")
+        messages.success(request, f"Заявката на {passenger_name} беше одобрена и имейлът е изпратен!")
 
     return redirect(f"{reverse('ride_detail', kwargs={'pk': booking.ride.pk})}#participants-section")
 
@@ -287,6 +316,17 @@ def reject_booking(request, booking_id):
             notification_type='cancellation',
             ride=booking.ride,
             message=f"Заявката ви за резервация за {booking.ride.origin} ➔ {booking.ride.destination} беше отклонена."
+        )
+
+        subject = f"Заявката ви бе отхвърлена: {booking.ride.origin} ➔ {booking.ride.destination}"
+        email_body = f"За съжаление шофьорът не можа да потвърди заявката ви за пътуването от {booking.ride.origin} до {booking.ride.destination}."
+        ride_url = reverse('ride_detail', kwargs={'pk': booking.ride.pk})
+
+        send_notification_email(
+            recipient=booking.passenger,
+            subject=subject,
+            message=email_body,
+            action_url=ride_url
         )
 
         messages.info(request, f"Заявката на {passenger_name} беше отклонена.")
@@ -317,6 +357,17 @@ def remove_passenger(request, booking_id):
             notification_type='cancellation',
             ride=booking.ride,
             message=f"Беше премахнат от пътуването {booking.ride.origin} ➔ {booking.ride.destination} от шофьора."
+        )
+
+        subject = f"Промяна по резервацията: {booking.ride.origin} ➔ {booking.ride.destination}"
+        email_body = f"Шофьорът ви премахна от пътуването от {booking.ride.origin} до {booking.ride.destination}."
+        ride_url = reverse('ride_detail', kwargs={'pk': booking.ride.pk})
+
+        send_notification_email(
+            recipient=booking.passenger,
+            subject=subject,
+            message=email_body,
+            action_url=ride_url
         )
 
         messages.info(request, f"Пътникът {passenger_name} беше премахнат от пътуването.")
@@ -354,6 +405,17 @@ def cancel_booking(request, pk):
             message=f"{passenger_name} отказа резервацията си за {ride.origin} ➔ {ride.destination}."
         )
 
+        subject = f"Отказ от резервация: {ride.origin} ➔ {ride.destination}"
+        email_body = f"Пътникът {passenger_name} отказа своята резервация за пътуването ви от {ride.origin} до {ride.destination}."
+        ride_url = reverse('ride_detail', kwargs={'pk': ride.id})
+
+        send_notification_email(
+            recipient=ride.driver,
+            subject=subject,
+            message=email_body,
+            action_url=f"{ride_url}#participants-section"
+        )
+
         messages.info(request, "Успешно се отказахте от пътуването.")
     else:
         messages.error(request, "Нямате активна резервация за това пътуване.")
@@ -384,6 +446,34 @@ def edit_ride(request, pk):
         form = RideForm(request.POST, instance=ride)
         if form.is_valid():
             form.save()
+
+            confirmed_bookings = Booking.objects.filter(
+                ride=ride,
+                status__in=['APPROVED', 'approved', 'confirmed', 'CONFIRMED']
+            ).select_related('passenger')
+
+            driver_name = get_user_display_name(request.user)
+            ride_url = reverse('ride_detail', kwargs={'pk': ride.pk})
+
+            for b in confirmed_bookings:
+                Notification.objects.create(
+                    recipient=b.passenger,
+                    sender=request.user,
+                    notification_type='update',
+                    ride=ride,
+                    message=f"Шофьорът {driver_name} актуализира детайлите за пътуването от {ride.origin} до {ride.destination}."
+                )
+
+                subject = f"Промяна в пътуването: {ride.origin} ➔ {ride.destination}"
+                email_body = f"Шофьорът {driver_name} актуализира детайлите за пътуването от {ride.origin} до {ride.destination}. Моля, прегледайте новата информация."
+
+                send_notification_email(
+                    recipient=b.passenger,
+                    subject=subject,
+                    message=email_body,
+                    action_url=ride_url
+                )
+
             messages.success(request, 'Пътуването беше обновено успешно!')
             return redirect('ride_detail', pk=ride.pk)
     else:
@@ -401,6 +491,33 @@ def delete_ride(request, pk):
         return redirect('ride_detail', pk=pk)
 
     if request.method == 'POST':
+        confirmed_bookings = Booking.objects.filter(
+            ride=ride,
+            status__in=['APPROVED', 'approved', 'confirmed', 'CONFIRMED']
+        ).select_related('passenger')
+
+        driver_name = get_user_display_name(request.user)
+        departure_str = ride.departure_time.strftime('%d.%m.%Y в %H:%M ч.')
+
+        for b in confirmed_bookings:
+            Notification.objects.create(
+                recipient=b.passenger,
+                sender=request.user,
+                notification_type='cancellation',
+                ride=None,
+                message=f"Пътуването от {ride.origin} до {ride.destination} ({departure_str}) беше отменено от шофьора."
+            )
+
+            subject = f"Отменено пътуване: {ride.origin} ➔ {ride.destination}"
+            email_body = f"Шофьорът {driver_name} отмени пътуването от {ride.origin} до {ride.destination}, насрочено за {departure_str}."
+
+            send_notification_email(
+                recipient=b.passenger,
+                subject=subject,
+                message=email_body,
+                action_url=reverse('home')
+            )
+
         ride.delete()
         messages.success(request, "Пътуването беше изтрито успешно.")
         return redirect('my_rides')
@@ -546,6 +663,7 @@ def proxy_geocode(request):
         return JsonResponse({'error': 'No city provided'}, status=400)
 
     headers = {'User-Agent': 'TakeTheTripApp/1.0 (contact@takethetripapp.com)'}
+
     url = f"https://nominatim.openstreetmap.org/search?format=json&city={city}&country=Bulgaria&limit=1"
 
     try:
@@ -559,6 +677,7 @@ def proxy_geocode(request):
 
             for item in results:
                 place_type = item.get('type', '')
+                osm_type = item.get('osm_type', '')
                 if place_type in ['city', 'town', 'village', 'administrative'] and item.get('class') == 'boundary':
                     continue
                 data = [item]
