@@ -668,8 +668,7 @@ def proxy_geocode(request):
 
     headers = {'User-Agent': 'TakeTheTripApp/1.0 (contact@takethetripapp.com)'}
 
-    url = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&featureType=settlement&limit=1"
-
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria&addressdetails=1&limit=1"
     try:
         response = requests.get(url, headers=headers, timeout=5)
         data = response.json()
