@@ -20,4 +20,5 @@ urlpatterns = [
     path('my-rides/', views.my_rides, name='my_rides'),
     path('ride/<int:pk>/delete/', views.delete_ride, name='delete_ride'),
     path('ride/<int:pk>/edit/', views.edit_ride, name='edit_ride'),
+    path('api/geocode/', views.proxy_geocode, name='proxy_geocode'),
 ]

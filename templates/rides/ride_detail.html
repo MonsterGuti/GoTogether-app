@@ -354,10 +354,10 @@
 
                 async function fetchCoords(city) {
                     try {
-                        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)},Bulgaria`);
+                        const response = await fetch(`/api/geocode/?q=${encodeURIComponent(city)}`);
                         const data = await response.json();
-                        if (data && data.length > 0) {
-                            return [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+                        if (data.lon && data.lat) {
+                            return [data.lon, data.lat];
                         }
                     } catch (e) {
                         console.error("Грешка при намиране на координатите за:", city, e);

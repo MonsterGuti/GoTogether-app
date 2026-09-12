@@ -651,3 +651,24 @@ def my_rides(request):
         'passenger_upcoming': passenger_upcoming,
         'passenger_past': passenger_past,
     })
+
+import requests
+from django.http import JsonResponse
+
+def proxy_geocode(request):
+    city = request.GET.get('q', '')
+    if not city:
+        return JsonResponse({'error': 'No city provided'}, status=400)
+
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={city},Bulgaria"
+    headers = {'User-Agent': 'TakeTheTripApp/1.0 (contact@takethetripapp.com)'}
+
+    try:
+        response = requests.get(url, headers=headers, timeout=5)
+        data = response.json()
+        if data:
+            return JsonResponse({'lon': float(data[0]['lon']), 'lat': float(data[0]['lat'])})
+    except Exception as e:
+        pass
+
+    return JsonResponse({'error': 'Not found'}, status=404)
