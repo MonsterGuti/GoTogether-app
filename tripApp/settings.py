@@ -113,9 +113,15 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Resend API Configuration
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-DEFAULT_FROM_EMAIL = 'TakeTheTrip <onboarding@resend.dev>'
+# Gmail SMTP Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'takethetripapp@gmail.com'
+EMAIL_HOST_PASSWORD = 'igwgzicgrjzutcs'
+DEFAULT_FROM_EMAIL = 'TakeTheTrip <takethetripapp@gmail.com>'
+
 SITE_URL = 'http://165.22.16.47'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
