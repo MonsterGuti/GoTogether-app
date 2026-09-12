@@ -1,7 +1,6 @@
 import threading
 from datetime import datetime
 import os
-import resend
 from django.contrib import messages
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
@@ -11,6 +10,8 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 
@@ -20,9 +21,6 @@ from .tokens import account_activation_token
 from notifications.models import Notification
 
 User = get_user_model()
-
-# Инициализиране на Resend API ключа
-resend.api_key = os.getenv("RESEND_API_KEY") or getattr(settings, "RESEND_API_KEY", None)
 
 
 def get_user_display_name(user):
@@ -41,41 +39,8 @@ def create_system_chat_message(ride, text):
 
 
 def send_notification_email(recipient, subject, message, action_url=None):
-    """Изпраща изчистен HTML имейл асинхронно чрез Resend API."""
+    """Имейл функционалността е временно изключена."""
     pass
-    # if recipient and recipient.email:
-    #     site_url = getattr(settings, 'SITE_URL', 'http://165.22.16.47')
-    #     full_action_url = f"{site_url}{action_url}" if action_url else site_url
-    #
-    #     html_content = f"""
-    #     <html>
-    #         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-    #             <div style="max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px;">
-    #                 <h2 style="color: #0d6efd; margin-top: 0;">TakeTheTrip</h2>
-    #                 <p>Здравейте, <strong>{get_user_display_name(recipient)}</strong>!</p>
-    #                 <p>{message}</p>
-    #                 <div style="margin-top: 25px; text-align: center;">
-    #                     <a href="{full_action_url}"
-    #                        style="background-color: #0d6efd; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-    #                         Към TakeTheTrip ➔
-    #                     </a>
-    #                 </div>
-    #             </div>
-    #         </body>
-    #     </html>
-    #     """
-    #
-    #     try:
-    #         params = {
-    #             "from": "TakeTheTrip <support@takethetripapp.com>",
-    #             "to": [recipient.email],
-    #             "subject": subject,
-    #             "html": html_content,
-    #         }
-    #         response = resend.Emails.send(params)
-    #         print(f"--- RIDES RESEND EMAIL SUCCESS ---: {response}")
-    #     except Exception as e:
-    #         print(f"--- RIDES RESEND EMAIL ERROR ---: {e}")
 
 
 def home(request):
@@ -656,7 +621,6 @@ def my_rides(request):
 
 
 import requests
-from django.http import JsonResponse
 
 
 def proxy_geocode(request):

@@ -1,4 +1,3 @@
-import threading
 from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, get_user_model
@@ -6,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg
 from django.conf import settings
-import os
-import resend
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
 
 from rides.models import Ride
 from reviews.models import Review
@@ -15,29 +14,6 @@ from .models import Profile
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 
 User = get_user_model()
-
-# Инициализиране на Resend API
-resend.api_key = os.getenv("RESEND_API_KEY") or getattr(settings, "RESEND_API_KEY", None)
-
-class ResendEmailThread(threading.Thread):
-    def __init__(self, recipient_email, subject, html_content):
-        self.recipient_email = recipient_email
-        self.subject = subject
-        self.html_content = html_content
-        super().__init__()
-
-    def run(self):
-        try:
-            params = {
-                "from": "onboarding@resend.dev",
-                "to": [self.recipient_email],
-                "subject": self.subject,
-                "html": self.html_content,
-            }
-            response = resend.Emails.send(params)
-            print(f"--- USERS RESEND SUCCESS ---: {response}")
-        except Exception as e:
-            print(f"--- USERS RESEND ERROR ---: {e}")
 
 
 def register(request):
@@ -72,8 +48,20 @@ def register(request):
                     </body>
                 </html>
                 """
+                plain_message = strip_tags(html_content)
 
-                ResendEmailThread(user.email, subject, html_content).start()
+                try:
+                    send_mail(
+                        subject=subject,
+                        message=plain_message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[user.email],
+                        html_message=html_content,
+                        fail_silently=False,
+                    )
+                    print(f"--- USERS SMTP SUCCESS ---: {user.email}")
+                except Exception as e:
+                    print(f"--- USERS SMTP ERROR ---: {e}")
 
             messages.success(request, f'Успешна регистрация! Добре дошли, {user.username}!')
             return redirect('home')
