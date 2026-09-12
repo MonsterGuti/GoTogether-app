@@ -2,13 +2,17 @@
 {% load static %}
 
 <!-- SEO и Мета Тагове за конкретното пътуване -->
-{% block title %}Пътуване от {{ ride.origin }} до {{ ride.destination }} за {{ ride.price_per_seat }} € — TakeTheTrip{% endblock %}
+{% block title %}Пътуване от {{ ride.origin }} до {{ ride.destination }} за {{ ride.price_per_seat }} € —
+    TakeTheTrip{% endblock %}
 
-{% block meta_description %}Споделено пътуване от {{ ride.origin }} до {{ ride.destination }} на {{ ride.departure_time|date:"d M Y, H:i" }} ч. Цена: {{ ride.price_per_seat }} €. Остават {{ ride.available_seats }} свободни места. Шофьор: {{ ride.driver.get_full_name|default:ride.driver.username }}.{% endblock %}
+{% block meta_description %}Споделено пътуване от {{ ride.origin }} до {{ ride.destination }} на
+    {{ ride.departure_time|date:"d M Y, H:i" }} ч. Цена: {{ ride.price_per_seat }} €. Остават {{ ride.available_seats }}
+    свободни места. Шофьор: {{ ride.driver.get_full_name|default:ride.driver.username }}.{% endblock %}
 
 {% block og_title %}Пътуване {{ ride.origin }} ➔ {{ ride.destination }} ({{ ride.price_per_seat }} €){% endblock %}
 
-{% block og_description %}Търсиш евтин и удобен транспорт? Заяви място за пътуването от {{ ride.origin }} до {{ ride.destination }} с {{ ride.driver.get_full_name|default:ride.driver.username }}.{% endblock %}
+{% block og_description %}Търсиш евтин и удобен транспорт? Заяви място за пътуването от {{ ride.origin }} до
+    {{ ride.destination }} с {{ ride.driver.get_full_name|default:ride.driver.username }}.{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -342,9 +346,10 @@
 
                 const map = L.map('route-map').setView([42.7339, 25.4858], 7);
 
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                     maxZoom: 19,
-                    attribution: '© OpenStreetMap'
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd'
                 }).addTo(map);
 
                 async function fetchCoords(city) {
