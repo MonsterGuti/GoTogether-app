@@ -1,12 +1,13 @@
-from datetime import datetime  # ако потрябва
 import threading
+from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Avg
-from django.core.mail import send_mail
 from django.conf import settings
+import os
+import resend
 
 from rides.models import Ride
 from reviews.models import Review
@@ -15,25 +16,28 @@ from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 
 User = get_user_model()
 
+# Инициализиране на Resend API
+resend.api_key = os.getenv("RESEND_API_KEY") or getattr(settings, "RESEND_API_KEY", None)
 
-class EmailThread(threading.Thread):
-    def __init__(self, subject, message, recipient_list, from_email=None, html_message=None):
+class ResendEmailThread(threading.Thread):
+    def __init__(self, recipient_email, subject, html_content):
+        self.recipient_email = recipient_email
         self.subject = subject
-        self.message = message
-        self.recipient_list = recipient_list
-        self.from_email = from_email
-        self.html_message = html_message
+        self.html_content = html_content
         super().__init__()
 
     def run(self):
-        send_mail(
-            subject=self.subject,
-            message=self.message,
-            from_email=self.from_email,
-            recipient_list=self.recipient_list,
-            html_message=self.html_message,
-            fail_silently=True,
-        )
+        try:
+            params = {
+                "from": "onboarding@resend.dev",
+                "to": [self.recipient_email],
+                "subject": self.subject,
+                "html": self.html_content,
+            }
+            response = resend.Emails.send(params)
+            print(f"--- USERS RESEND SUCCESS ---: {response}")
+        except Exception as e:
+            print(f"--- USERS RESEND ERROR ---: {e}")
 
 
 def register(request):
@@ -56,20 +60,20 @@ def register(request):
 
             if user.email:
                 subject = 'Добре дошли в TakeTheTrip!'
-                message = (
-                    f'Здравейте, {user.username}!\n\n'
-                    f'Благодарим ви, че се регистрирахте в TakeTheTrip. '
-                    f'Сега можете да споделяте пътуванията си или да намерите удобен транспорт.\n\n'
-                    f'Желаем ви приятни и безаварийни пътувания!\n\n'
-                    f'Поздрави,\nЕкипът на TakeTheTrip'
-                )
+                html_content = f"""
+                <html>
+                    <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                        <div style="max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                            <h2 style="color: #0d6efd; margin-top: 0;">TakeTheTrip</h2>
+                            <p>Здравейте, <strong>{user.username}</strong>!</p>
+                            <p>Благодарим ви, че се регистрирахте в TakeTheTrip. Сега можете да споделяте пътуванията си или да намерите удобен транспорт.</p>
+                            <p>Желаем ви приятни и безаварийни пътувания!</p>
+                        </div>
+                    </body>
+                </html>
+                """
 
-                EmailThread(
-                    subject=subject,
-                    message=message,
-                    recipient_list=[user.email],
-                    from_email=settings.DEFAULT_FROM_EMAIL
-                ).start()
+                ResendEmailThread(user.email, subject, html_content).start()
 
             messages.success(request, f'Успешна регистрация! Добре дошли, {user.username}!')
             return redirect('home')

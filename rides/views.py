@@ -43,7 +43,7 @@ def create_system_chat_message(ride, text):
 def send_notification_email(recipient, subject, message, action_url=None):
     """Изпраща изчистен HTML имейл асинхронно чрез Resend API."""
     if recipient and recipient.email:
-        site_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
+        site_url = getattr(settings, 'SITE_URL', 'http://165.22.16.47')
         full_action_url = f"{site_url}{action_url}" if action_url else site_url
 
         html_content = f"""
@@ -72,9 +72,9 @@ def send_notification_email(recipient, subject, message, action_url=None):
                 "html": html_content,
             }
             response = resend.Emails.send(params)
-            print(f"--- RESEND EMAIL SUCCESS ---: {response}")
+            print(f"--- RIDES RESEND EMAIL SUCCESS ---: {response}")
         except Exception as e:
-            print(f"--- RESEND EMAIL ERROR ---: {e}")
+            print(f"--- RIDES RESEND EMAIL ERROR ---: {e}")
 
 
 def home(request):
@@ -114,7 +114,6 @@ def register(request):
             user.is_active = False  # Неактивен до потвърждаване на имейла
             user.save()
 
-            # Генериране на UID и токен за потвърждение
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
             activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})

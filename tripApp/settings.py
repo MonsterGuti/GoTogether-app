@@ -17,11 +17,12 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+hqoe4rceqvhse$qdlhor5*l1bja&q6u8375y07mp)pa$ulicc')
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['takethetripapp.com', 'www.takethetripapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['takethetripapp.com', 'www.takethetripapp.com', 'localhost', '127.0.0.1', '165.22.16.47']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://takethetripapp.com',
     'https://www.takethetripapp.com',
+    'http://165.22.16.47',
 ]
 
 # Application definition
@@ -113,17 +114,9 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'
-EMAIL_PORT = 2525
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'b8e474a001@smtp-brevo.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-
-DEFAULT_FROM_EMAIL = 'TakeTheTrip <takethetripapp@gmail.com>'
+# Resend API Configuration
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+DEFAULT_FROM_EMAIL = 'TakeTheTrip <onboarding@resend.dev>'
 SITE_URL = 'http://165.22.16.47'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
